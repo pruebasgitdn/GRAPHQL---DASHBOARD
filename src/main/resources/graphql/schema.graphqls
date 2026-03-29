@@ -1,0 +1,51 @@
+type User {
+    id: ID!
+    name: String!
+    email: String!
+    profilePic: String
+}
+
+type UserMe {
+    id: ID!
+    email: String!
+}
+
+type AuthResponse {
+    token: String!
+    email: String!
+    userId: ID!
+    expiresIn: Int!
+
+}
+
+input LoginInput {
+    email: String!
+    password: String!
+}
+
+
+input UserInput {
+    name: String!
+    email: String!
+    password: String!
+    profilePic: String
+}
+
+
+type Query {
+    userList: [User!]
+
+    user(id: ID!): User
+
+    me: User
+
+
+}
+
+type Mutation {
+
+    login(login: LoginInput!): AuthResponse
+
+    registerStudent(user: UserInput!): User
+
+}
