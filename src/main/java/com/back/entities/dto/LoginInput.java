@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LoginInput {
 
-    //@NotNull(message = "El email no puede ser nulo")
-    //@Email(message = "Ingresa un email valido")
+    @NotNull(message = "El email no puede ser nulo")
+    @Email(message = "Ingresa un email valido")
     private String email;
 
 
-    //@NotNull(message = "La contraseña no puede ser nula")
-    //@Size(max = 10,message = "La contraseña debe tener máximo 10 caracteres" )
+    @NotNull(message = "La contraseña no puede ser nula")
+    @Size(max = 10,message = "La contraseña debe tener máximo 10 caracteres" )
     private String password;
 }

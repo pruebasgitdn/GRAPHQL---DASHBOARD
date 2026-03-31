@@ -36,9 +36,11 @@ public class Workspace {
 
 
     //Relaciones 1:N
+    @Builder.Default
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
     private List<WorkspaceMember> members = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
     private List<Project> projects = new ArrayList<>();
 

@@ -5,18 +5,55 @@ type User {
     profilePic: String
 }
 
-type UserMe {
-    id: ID!
-    email: String!
+enum Role {
+    OWNER,
+    ADMIN,
+    MEMBER,
+    GUEST
 }
+
+type Workspace {
+
+    id: ID!
+    name: String!
+    owner: User!
+
+}
+
+type WorkspaceMember {
+
+    user: User!
+    workspace: Workspace!
+    role: Role!
+
+}
+
+
+input CreateProjectInput {
+    name: String!
+    description: String
+}
+
+input CreateWorkspaceInput {
+    name: String!
+}
+
 
 type AuthResponse {
     token: String!
     email: String!
     userId: ID!
     expiresIn: Int!
-
 }
+
+type WorkspaceResponse {
+    id: ID!
+    name: String!
+    owner: User!
+    memberCount: Int!
+}
+
+
 
 input LoginInput {
     email: String!
@@ -33,12 +70,17 @@ input UserInput {
 
 
 type Query {
-    userList: [User!]
+    userList: [User]
+
+    workspaceList: [WorkspaceResponse]
+
+    workspace(id: ID!): WorkspaceResponse
 
     user(id: ID!): User
 
     me: User
 
+    getMembersAndRoles: [WorkspaceMember!]!
 
 }
 
@@ -46,6 +88,11 @@ type Mutation {
 
     login(login: LoginInput!): AuthResponse
 
-    registerStudent(user: UserInput!): User
+    registerUser(user: UserInput!): User
+
+    createWorkspace(workspaceInput: CreateWorkspaceInput): WorkspaceResponse
+
+    addMembersToWorkspace(userIds: [ID!]!, workspace_id: ID!): WorkspaceResponse
+
 
 }

@@ -23,7 +23,7 @@ public class GrapQLUserController {
     // @PreAuthorize("hasRole('USER')") => revisar cual meti verdaderamente
 
 
-    @MutationMapping(name = "registerStudent")
+    @MutationMapping(name = "registerUser")
     public User registerUser(@Valid @Argument UserInput user){
         return userService.registerUser(user);
     }

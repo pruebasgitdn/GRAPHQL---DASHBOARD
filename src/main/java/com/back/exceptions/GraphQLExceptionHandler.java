@@ -18,14 +18,12 @@ public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter
         if (ex instanceof RuntimeException) {
             return GraphqlErrorBuilder.newError()
                     .message(ex.getMessage()) // mensaje
-                    .path(env.getExecutionStepInfo().getPath())
                     .errorType(ErrorType.DataFetchingException)
                     .build();
         }
         if (ex instanceof InvalidCredentialsException) {
             return GraphqlErrorBuilder.newError()
                     .message("Credenciales incorrectas")
-                    .path(env.getExecutionStepInfo().getPath())
                     .errorType(ErrorType.DataFetchingException)
                     .build();
         }
@@ -33,7 +31,6 @@ public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter
         if (ex instanceof UserNotFoundException) {
             return GraphqlErrorBuilder.newError()
                     .message("Usuario no encontrado")
-                    .path(env.getExecutionStepInfo().getPath())
                     .errorType(ErrorType.DataFetchingException)
                     .build();
         }
@@ -41,7 +38,6 @@ public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter
         if (ex instanceof RuntimeException) {
             return GraphqlErrorBuilder.newError()
                     .message(ex.getMessage())
-                    .path(env.getExecutionStepInfo().getPath())
                     .errorType(ErrorType.DataFetchingException)
                     .build();
         }
