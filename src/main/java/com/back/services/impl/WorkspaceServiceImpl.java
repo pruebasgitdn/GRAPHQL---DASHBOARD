@@ -17,8 +17,10 @@ import com.back.services.WorkspaceMemberService;
 import com.back.services.WorkspaceService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WorkspaceServiceImpl implements WorkspaceService {
 
     private final WorkspaceRepository workspaceRepository;
@@ -94,6 +97,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         long count = workspaceMemberRepository.countByWorkspaceId(id);
 
+        log.debug("DBG",count);
+
         return WorkspaceResponse.builder()
                 .id(workspace.getId())
                 .name(workspace.getName())
@@ -114,20 +119,28 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new RuntimeException("No tienes permisos");
         }
 
+
+        if(users_id == null || users_id.isEmpty()){
+            throw new RuntimeException("Lista vacía");
+        }
+
+        Set<UUID> uniqueUserIds = new HashSet<>(users_id);
+        uniqueUserIds.remove(owner_id); //Excluir el id del dueño no queremos errores si sabe
+
+
         //Encontras usuarios
-        List<User> usersToAdd = userRepository.findAllById(users_id);
-        if(usersToAdd.size() != users_id.size() ){
+        List<User> usersToAdd = userRepository.findAllById(uniqueUserIds);
+        if(usersToAdd.size() != uniqueUserIds.size() ){
             throw new ItemNotFoundException("Uno o mas IDs no existen");
         }
+
+
 
         //Encontrar grupo
         Workspace workspace = workspaceRepository.findById(workspace_id).orElseThrow(()->{
             throw  new ItemNotFoundException("Worspace no encontrado por el id : "+workspace_id);
         });
 
-        if(users_id == null || users_id.isEmpty()){
-            throw new RuntimeException("Lista vacía");
-        }
 
 
         //IDS de usuarios del workspace existente
@@ -153,5 +166,80 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         // Retornar
         return workspaceMapper.toResponse(workspace);
+    }
+
+    @Override
+    @Transactional
+    public WorkspaceResponse removeMembersFromWorkspace(List<UUID> users, UUID workspace_id, UUID owner_id) {
+
+        //Verificar que el autenticado sea admin o owner
+        boolean isAdminOrOwner = workspaceMemberService.isAdminOrOwner(owner_id,workspace_id);
+        System.out.println("Eres admin u owner? "+isAdminOrOwner);
+        if (!isAdminOrOwner) {
+            throw new RuntimeException("No tienes permisos");
+        }
+
+        if(users == null || users.isEmpty()){
+            throw new RuntimeException("Lista vacía");
+        }
+
+        Set<UUID> uniqueUserIds = new HashSet<>(users);
+
+        uniqueUserIds.remove(owner_id); //Excluir el id del dueño no queremos errores si sabe
+
+        //Verificar users
+        List<User> usersToRemove = userRepository.findAllById(users);
+        if(usersToRemove.size() != users.size() ){
+            throw new ItemNotFoundException("Uno o mas IDs no existen");
+        }
+
+        //Encontrar workspace
+        Workspace workspace = workspaceRepository.findById(workspace_id).orElseThrow(()->{
+            throw  new ItemNotFoundException("Worspace no encontrado por el id : "+workspace_id);
+        });
+
+        //Pertenencia al grupo verific
+        Set<UUID> workspaceUserIds = workspace.getMembers().stream()
+                .map(wm -> wm.getUser().getId())
+                .collect(Collectors.toSet());
+        if(!workspaceUserIds.containsAll(uniqueUserIds)){
+            throw new RuntimeException("Usuarios no pertenecen al workspace: "+workspace.getName());
+        }
+
+        //elimnar de la relacion
+        workspace.getMembers().removeIf(wm ->
+                uniqueUserIds.contains(wm.getUser().getId())
+        );
+
+        return workspaceMapper.toResponse(workspace);
+    }
+
+    @Transactional
+    @Override
+    public Boolean removeWorkspace(UUID workspace_id,UUID owner_id) {
+
+        //Verificar que el autenticado sea admin o owner
+        boolean isAdminOrOwner = workspaceMemberService.isAdminOrOwner(owner_id,workspace_id);
+        System.out.println("Eres admin u owner? "+isAdminOrOwner);
+        if (!isAdminOrOwner) {
+            throw new RuntimeException("No tienes permisos");
+        }
+
+
+        //Encontrar workspace
+        Workspace workspace = workspaceRepository.findById(workspace_id).orElseThrow(()->{
+            throw  new ItemNotFoundException("Worspace no encontrado por el id : "+workspace_id);
+        });
+
+
+        //eliminar de la relacion todos los usuarios asociados a dicho tan
+        workspace.getMembers().clear();
+
+        workspaceRepository.deleteById(workspace_id);
+
+        return true;
+
+
+
     }
 }

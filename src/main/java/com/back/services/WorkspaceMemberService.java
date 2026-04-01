@@ -11,4 +11,10 @@ public interface WorkspaceMemberService {
     boolean isAdminOrOwner(UUID user_id, UUID workspace_id);
 
     List<WorkspaceMember> findAll();
+
+    List<WorkspaceMember> getUserWorkspaces(UUID user_id);
+
+    List<WorkspaceMember> getWorkspaceUsers(UUID workspace_id);
+
+
 }

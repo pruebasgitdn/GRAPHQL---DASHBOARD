@@ -10,6 +10,7 @@ import com.back.repositories.WorkspaceRepository;
 import com.back.services.WorkspaceMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,9 +51,19 @@ public class GraphQLWorkspaceMembersController {
         return wm.getWorkspace();
     }
 
-//    @PreAuthorize("isAuthenticated()")
-//    @QueryMapping(name = "getMembersAndRoles")
-//
+
+
+    @QueryMapping(name = "getWorkspaceMembers")
+    public List<WorkspaceMember> getWorkspaceMembers(@Argument(name = "workspaceId") UUID workspaceId){
+        return  workspaceMemberService.getWorkspaceUsers(workspaceId);
+    }
+
+
+    @QueryMapping(name = "getMemberWorkspaces")
+    public List<WorkspaceMember> getMemberWorkspaces(@Argument(name = "memberId") UUID memberId){
+        return  workspaceMemberService.getUserWorkspaces(memberId);
+    }
+
 
 
 //    @SchemaMapping(typeName = "WorkspaceMembersResponse", field = "users","workspace")

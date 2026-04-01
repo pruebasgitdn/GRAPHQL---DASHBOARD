@@ -19,6 +19,4 @@ public class WorkspaceResponse {
     private UUID ownerId;
     private Long memberCount;
 
-
-
 }

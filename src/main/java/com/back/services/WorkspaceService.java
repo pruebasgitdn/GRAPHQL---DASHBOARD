@@ -18,4 +18,9 @@ public interface WorkspaceService {
     WorkspaceResponse findById(UUID id);
 
     WorkspaceResponse addMemberToWorkspace(List<UUID> users, UUID workspace_id,UUID owner_id);
+
+    WorkspaceResponse removeMembersFromWorkspace(List<UUID> users, UUID workspace_id,UUID owner_id);
+
+    Boolean removeWorkspace( UUID workspace_id,UUID owner_id);
+
 }

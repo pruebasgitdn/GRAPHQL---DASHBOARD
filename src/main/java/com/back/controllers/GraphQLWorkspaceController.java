@@ -56,7 +56,7 @@ public class GraphQLWorkspaceController {
     @PreAuthorize("isAuthenticated()")
     @MutationMapping(name = "addMembersToWorkspace")
     public WorkspaceResponse addMemberToWorkspace(@Argument(name = "userIds") List<UUID> users,
-                                                  @Argument(name = "workspace_id") UUID workspace_id,
+                                                  @Argument(name = "workspaceId") UUID workspace_id,
                                                   @AuthenticationPrincipal UserDetailsImpl authenticated
 
     ){
@@ -73,6 +73,36 @@ public class GraphQLWorkspaceController {
         return userRepository.findById(workspace.getOwnerId())
                 .orElseThrow(() -> new RuntimeException("Owner no encontrado"));
     }
+
+    //removeMembersFromWorkspace
+    @PreAuthorize("isAuthenticated()")
+    @MutationMapping(name = "removeMembersFromWorkspace")
+    public WorkspaceResponse removeMembersFromWorkspace(@Argument(name = "userIds") List<UUID> users,
+                                                  @Argument(name = "workspaceId") UUID workspace_id,
+                                                  @AuthenticationPrincipal UserDetailsImpl authenticated
+
+    ){
+        if(authenticated == null){
+            throw new AuthenticationCredentialsNotFoundException("No se econtraron las credenciales de autenticacion");
+        }
+
+        return workspaceService.removeMembersFromWorkspace(users,workspace_id,authenticated.getId());
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @MutationMapping(name = "removeWorkspace")
+    public Boolean removeWorkspace(@Argument(name = "workspaceId") UUID workspace_id,
+                                             @AuthenticationPrincipal UserDetailsImpl authenticated
+
+    ){
+        if(authenticated == null){
+            throw new AuthenticationCredentialsNotFoundException("No se econtraron las credenciales de autenticacion");
+        }
+
+        return workspaceService.removeWorkspace(workspace_id,authenticated.getId());
+    }
+
+
 
 
 

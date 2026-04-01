@@ -17,4 +17,10 @@ public interface WorkspaceMemberRepository extends JpaRepository<WorkspaceMember
             UUID userId,
             List<Role> roles
     );
+
+    List<WorkspaceMember> findAllByUserId(UUID id);
+
+    List<WorkspaceMember> findAllByWorkspaceId(UUID id);
+
+
 }

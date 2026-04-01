@@ -18,11 +18,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class WorkspaceMembersResponse {
 
-//    private List<User> users;
-//
-//    private Workspace workspace;
-//
-//    private Role role;
 
     private User user;
 

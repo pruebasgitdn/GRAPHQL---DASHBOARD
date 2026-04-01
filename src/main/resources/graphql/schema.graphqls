@@ -82,6 +82,10 @@ type Query {
 
     getMembersAndRoles: [WorkspaceMember!]!
 
+    getWorkspaceMembers(workspaceId: ID!) : [WorkspaceMember!]!
+
+    getMemberWorkspaces(memberId: ID!) : [WorkspaceMember!]!
+
 }
 
 type Mutation {
@@ -92,7 +96,14 @@ type Mutation {
 
     createWorkspace(workspaceInput: CreateWorkspaceInput): WorkspaceResponse
 
-    addMembersToWorkspace(userIds: [ID!]!, workspace_id: ID!): WorkspaceResponse
+    addMembersToWorkspace(userIds: [ID!]!, workspaceId: ID!): WorkspaceResponse
+
+    removeMembersFromWorkspace(userIds: [ID!]!, workspaceId: ID!): WorkspaceResponse
+
+    removeWorkspace(workspaceId: ID!): Boolean
+
+
+
 
 
 }
