@@ -44,27 +44,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public AuthResponse authenticate(String email, String password) {
 
         //autentica
-     try{
-         authenticationManager.authenticate((
-                 new UsernamePasswordAuthenticationToken(email,password)
-         ));
-     } catch (BadCredentialsException ex) {
-        //throw new RuntimeException("Credenciales Incorrectas");
-        throw  new InvalidCredentialsException();
-     }catch (UsernameNotFoundException ex) {
-         //throw new RuntimeException("Usuario no encontrado");
+        try {
+            authenticationManager.authenticate((
+                    new UsernamePasswordAuthenticationToken(email, password)
+            ));
+        } catch (BadCredentialsException ex) {
+            //throw new RuntimeException("Credenciales Incorrectas");
+            throw new InvalidCredentialsException();
+        } catch (UsernameNotFoundException ex) {
+            //throw new RuntimeException("Usuario no encontrado");
             throw new UserNotFoundException();
-     }
+        }
 
         // generar el token y retornarlo
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         String jwtToken = generateToken(userDetails);
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado por el email: {}"+email));
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado por el email: {}" + email));
 
 
         return AuthResponse.builder()
                 .token(jwtToken)
+                .refreshToken(generateRefreshToken(userDetails))
                 .userId(user.getId())
                 .email(user.getEmail())
                 .expiresIn(86000)
@@ -73,13 +74,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public String generateToken(UserDetails userDetails) {
-        Map<String,Object> claim = new HashMap<>();
 
         return Jwts.builder()
-                .setClaims(claim) // claim
+                .claim("type", "access")
                 .setSubject(userDetails.getUsername()) //dueño del token
                 .setIssuedAt(new Date(System.currentTimeMillis())) //fecha creacion
-                .setExpiration(new Date(System.currentTimeMillis()+jwtExpiryMs))// fecha expiracion
+                .setExpiration(new Date(System.currentTimeMillis() + 15 * 60 * 1000L))// fecha expiracion
                 .signWith(getSigninKey(), SignatureAlgorithm.HS256) //firmado con y el algoritmo
                 .compact();//Compacta y devuelve como String JWT
 
@@ -88,17 +88,35 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public UserDetails validateToken(String token) {
-        String username = extractName(token);
-        return  userDetailsService.loadUserByUsername(username);
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigninKey())
+                .build()
+                .parseClaimsJws(token) //validar firma
+                .getBody();
+
+        String username = claims.getSubject();
+
+        return userDetailsService.loadUserByUsername(username);
+    }
+
+    @Override
+    public String generateRefreshToken(UserDetails userDetails) {
+        return Jwts.builder()
+                .claim("type", "refresh")
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis())) //fecha creacion
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiryMs))// renovacion
+                .signWith(getSigninKey(), SignatureAlgorithm.HS256) //firmado con y el algoritmo
+                .compact();
     }
 
 
-    private Key getSigninKey(){
+    private Key getSigninKey() {
         byte[] keyBytes = secretKey.getBytes();
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    private String extractName(String token){
+    private String extractName(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSigninKey()) //Obtener llave con la q se firmo
                 .build()//Construir
@@ -110,6 +128,54 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return claims.getSubject();
     }
 
+
+    private Claims extractClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigninKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    @Override
+    public boolean isAccessToken(String token) {
+        return "access".equals(extractClaims(token).get("type"));
+    }
+
+    @Override
+    public boolean isRefreshToken(String token) {
+        return "refresh".equals(extractClaims(token).get("type"));
+    }
+
+    @Override
+    public AuthResponse refreshToken(String token) {
+
+        if(!isRefreshToken(token)){
+            throw  new RuntimeException("Token invalido");
+        }
+
+        //Extrar subject email q fue con lo q se firmo
+        Claims claims = extractClaims(token);
+        String email = claims.getSubject();
+
+        //Y encontrar los datos de ese perol por el gmail para setearlo
+        //Si sabe
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+        String newAccessToken = generateToken(userDetails);
+        String newRefreshToken = generateRefreshToken(userDetails);
+        return AuthResponse.builder()
+                .token(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .email(user.getEmail())
+                .userId(user.getId())
+                .expiresIn(86400)
+                .build();
+
+    }
 
 
 }

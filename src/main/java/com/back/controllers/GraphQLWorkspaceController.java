@@ -80,7 +80,6 @@ public class GraphQLWorkspaceController {
     public WorkspaceResponse removeMembersFromWorkspace(@Argument(name = "userIds") List<UUID> users,
                                                   @Argument(name = "workspaceId") UUID workspace_id,
                                                   @AuthenticationPrincipal UserDetailsImpl authenticated
-
     ){
         if(authenticated == null){
             throw new AuthenticationCredentialsNotFoundException("No se econtraron las credenciales de autenticacion");
@@ -93,7 +92,6 @@ public class GraphQLWorkspaceController {
     @MutationMapping(name = "removeWorkspace")
     public Boolean removeWorkspace(@Argument(name = "workspaceId") UUID workspace_id,
                                              @AuthenticationPrincipal UserDetailsImpl authenticated
-
     ){
         if(authenticated == null){
             throw new AuthenticationCredentialsNotFoundException("No se econtraron las credenciales de autenticacion");

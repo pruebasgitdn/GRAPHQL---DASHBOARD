@@ -33,6 +33,13 @@ public class GraphQLAuthController {
         );
     }
 
+
+    @MutationMapping(name = "refreshToken")
+    public AuthResponse refreshToken(@Argument String token) {
+        return authenticationService.refreshToken(token);
+    }
+
+
     @QueryMapping(name = "me")
     public User me(@AuthenticationPrincipal UserDetailsImpl user) {
         return User.builder()

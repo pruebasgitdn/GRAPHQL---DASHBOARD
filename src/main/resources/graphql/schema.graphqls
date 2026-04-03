@@ -6,11 +6,18 @@ type User {
 }
 
 enum Role {
-    OWNER,
-    ADMIN,
-    MEMBER,
-    GUEST
+    OWNER,ADMIN,MEMBER,GUEST
 }
+
+enum TaskStatus {
+    LOW,MEDIUM,HIGH,URGENT
+}
+
+
+enum TaskPriority {
+    TODO,IN_PROGRESS,DONE,BLOCKED
+}
+
 
 type Workspace {
 
@@ -19,6 +26,33 @@ type Workspace {
     owner: User!
 
 }
+
+
+type Task {
+    id:Int!
+    title: String!
+    project: [Project]!
+    description: String
+    status: TaskStatus
+    priority: TaskPriority
+}
+
+
+type Project {
+
+    id: Int!
+
+    name: String!
+
+    description:String
+
+    workspace: ID!
+
+    tasks: [Task!]
+
+}
+
+
 
 type WorkspaceMember {
 
@@ -29,10 +63,7 @@ type WorkspaceMember {
 }
 
 
-input CreateProjectInput {
-    name: String!
-    description: String
-}
+
 
 input CreateWorkspaceInput {
     name: String!
@@ -41,6 +72,7 @@ input CreateWorkspaceInput {
 
 type AuthResponse {
     token: String!
+    refreshToken: String!
     email: String!
     userId: ID!
     expiresIn: Int!
@@ -68,6 +100,14 @@ input UserInput {
     profilePic: String
 }
 
+input CreateProjectInput {
+    name: String!
+    description: String
+    workspaceId: ID!
+    taskIds: [ID]
+}
+
+
 
 type Query {
     userList: [User]
@@ -86,6 +126,8 @@ type Query {
 
     getMemberWorkspaces(memberId: ID!) : [WorkspaceMember!]!
 
+    allProjects: [Project]
+
 }
 
 type Mutation {
@@ -102,8 +144,8 @@ type Mutation {
 
     removeWorkspace(workspaceId: ID!): Boolean
 
+    createProject(createProjectInput: CreateProjectInput!): Project
 
-
-
+    refreshToken(token: String!): AuthResponse
 
 }

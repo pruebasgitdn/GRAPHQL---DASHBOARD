@@ -41,7 +41,7 @@ public class Workspace {
     private List<WorkspaceMember> members = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Project> projects = new ArrayList<>();
 
 

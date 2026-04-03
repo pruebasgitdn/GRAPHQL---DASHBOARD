@@ -12,7 +12,12 @@ public interface AuthenticationService {
 
     UserDetails validateToken(String token);
 
+    String generateRefreshToken(UserDetails userDetails);
 
+    boolean isAccessToken(String token);
 
+    boolean isRefreshToken(String token);
+
+    AuthResponse refreshToken(String token);
 
 }
