@@ -1,28 +1,27 @@
 package com.back.entities.dto;
-
-
-import com.back.entities.Project;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class WorkspaceResponse {
+@AllArgsConstructor
+public class UserResponse {
 
     private UUID id;
-    private String name;
-    private UUID ownerId;
-    private Long memberCount;
-    private Long projectCount;
 
+    private String name;
+
+    private  String email;
+
+    private  String profilePic;
 
 
 }

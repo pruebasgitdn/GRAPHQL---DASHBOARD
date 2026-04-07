@@ -4,6 +4,12 @@ import com.back.entities.Project;
 import com.back.entities.Task;
 import com.back.entities.Workspace;
 import com.back.entities.dto.CreateProjectInput;
+import com.back.entities.dto.EditProjectInput;
+import com.back.entities.dto.ProjectResponse;
+import com.back.entities.dto.WorkspaceResponse;
+import com.back.entities.mappers.ProjectMapper;
+import com.back.entities.mappers.TasksMapper;
+import com.back.entities.mappers.WorkspaceMapper;
 import com.back.exceptions.AlreadyExistException;
 import com.back.exceptions.GraphQLExceptionHandler;
 import com.back.exceptions.ItemNotFoundException;
@@ -12,6 +18,7 @@ import com.back.repositories.TasksRepository;
 import com.back.repositories.WorkspaceRepository;
 import com.back.services.ProjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -25,11 +32,14 @@ public class ProjectServiceImpl implements ProjectService {
     private final WorkspaceRepository workspaceRepository;
     private final TasksRepository tasksRepository;
 
+    private final TasksMapper tasksMapper;
+    private final WorkspaceMapper workspaceMapper;
+    private final ProjectMapper projectMapper;
+
 
 
     @Override
-    public Project createProject(CreateProjectInput projectInput) {
-
+    public ProjectResponse createProject(CreateProjectInput projectInput) {
 
         //Encontrar workspace
         Workspace workspace = workspaceRepository.findById(projectInput.getWorkspaceId()).orElseThrow(()->{
@@ -37,21 +47,19 @@ public class ProjectServiceImpl implements ProjectService {
         });
 
 
+        String name = projectInput.getName().trim(); //Normalizar
+        //Validar
+        if(projectRepository.existsByNameAndWorkspaceId(name,workspace.getId())){
+            throw new AlreadyExistException("Ya existe un proyecto con ese nombre en este workspace");
+        }
+
         //Si hay tasks enviadas asginarlas
         List<Task> tasksListToAdd = new ArrayList<>();
         if(projectInput.getTaskIds() != null && !projectInput.getTaskIds().isEmpty())
         {
-//           tasksListToAdd = projectInput.getTaskIds();
            tasksListToAdd = tasksRepository.findAllById(projectInput.getTaskIds());
         }
 
-        List<Project> allP = projectRepository.findAll();
-
-        boolean exist = allP.stream().anyMatch(p-> p.getName().equalsIgnoreCase(projectInput.getName()));
-        //No mismo name si sabe
-        if(exist){
-            throw  new AlreadyExistException("Ya existe un projecto con ese nombre, intenta con otro.");
-        }
 
         //Crear pryecto y retornar
         Project project = Project
@@ -62,11 +70,21 @@ public class ProjectServiceImpl implements ProjectService {
                 .tasks(tasksListToAdd)
                 .build();
 
-        return projectRepository.save(project);
+         projectRepository.save(project);
+
+         Long countTasks = tasksRepository.countByProjectId(project.getId());
+
+
+        return  ProjectResponse.builder()
+                .id(project.getId())
+                .description(project.getDescription())
+                .workspace(workspaceMapper.toResponseWithoutCount(project.getWorkspace()))
+                .tasksCount(countTasks)
+                .build();
     }
 
     @Override
-    public List<Project> allProjects() {
+    public List<ProjectResponse> allProjects() {
 
         List<Project> projects = projectRepository.findAll();
 
@@ -74,6 +92,79 @@ public class ProjectServiceImpl implements ProjectService {
             throw new ItemNotFoundException("No se se encontraron proyectos");
         }
 
-        return projects;
+        return projects.stream()
+                .map(pro -> {
+                    Long count = tasksRepository.countByProjectId(pro.getId());
+                    return projectMapper.toResponse(pro,count);
+                }).toList();
+
     }
+
+    @Override
+    public ProjectResponse getProject(Long id) {
+        Project project = projectRepository.findById(id).orElseThrow(()->{
+            throw  new ItemNotFoundException("No se se encontraron proyectos por el id: "+id);
+        });
+
+        Long count = tasksRepository.countByProjectId(project.getId());
+
+        return projectMapper.toResponse(project,count);
+    }
+
+    @Override
+    public List<ProjectResponse> findAllByWorkspaceId(UUID id) {
+
+        List<Project> projectList = projectRepository.findAllByWorkspaceId(id);
+
+        if(projectList.isEmpty()){
+            throw new ItemNotFoundException("No se se encontraron proyectos por el workspaceid: "+ id);
+        }
+
+
+        return projectList.stream()
+                .map(pro -> {
+                    Long count = tasksRepository.countByProjectId(pro.getId());
+                    return projectMapper.toResponse(pro,count);
+                }).toList();
+
+    }
+
+    @Override
+    public ProjectResponse editProject(Long projectId,EditProjectInput editProjectInput) {
+        //Por el momenton no reasigna al espaciodetrabajo => workspaceId no edit sisabe miparcero
+
+        //buscar proyecto
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ItemNotFoundException("Proyecto no encontrado"));
+
+        //validar nombre y actualizar
+        projectMapper.updateProjectFromDto(editProjectInput,project);
+
+        if(editProjectInput.getTaskIds() != null){
+            List<Task> tasks = tasksRepository.findAllById(editProjectInput.getTaskIds());
+
+            //setear el cambio en la relacion
+            tasks.forEach(task-> task.setProject(project));
+            project.setTasks(tasks);
+
+        }
+
+        projectRepository.save(project);
+
+        Long count = tasksRepository.countByProjectId(project.getId());
+
+        return projectMapper.toResponse(project,count);
+    }
+
+    @Override
+    public Boolean deleteProject(Long projectId) {
+
+        projectRepository.deleteById(projectId);
+
+        return true;
+    }
+
+
 }
+
+

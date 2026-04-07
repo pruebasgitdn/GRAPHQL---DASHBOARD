@@ -2,6 +2,7 @@ package com.back.repositories;
 
 
 import com.back.entities.WorkspaceMember;
+import com.back.entities.dto.WorkspaceMemberResponse;
 import com.back.enums.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 

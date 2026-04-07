@@ -2,20 +2,18 @@ package com.back.entities;
 import com.back.enums.TaskPriority;
 import com.back.enums.TaskStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class Task {
 
     @Id
@@ -46,21 +44,25 @@ public class Task {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-
     //R 1:M
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<TaskAssignee> assignees = new ArrayList<>();
 
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL,orphanRemoval = true)
+    @Builder.Default
     private List<TaskLabel> labels = new ArrayList<>();
 
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL,orphanRemoval = true)
+    @Builder.Default
     private List<Notification> notifications = new ArrayList<>();
 
-    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL,orphanRemoval = true)
+    @Builder.Default
     private List<Attachment> attachments = new ArrayList<>();
 
     @PrePersist

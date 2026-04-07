@@ -27,18 +27,19 @@ type Workspace {
 
 }
 
-
-type Task {
-    id:Int!
-    title: String!
-    project: [Project]!
+type TaskResponse {
+    id: Int
+    title: String
     description: String
+    project: ProjectResponse
     status: TaskStatus
     priority: TaskPriority
 }
 
 
-type Project {
+
+
+type ProjectResponse {
 
     id: Int!
 
@@ -46,9 +47,9 @@ type Project {
 
     description:String
 
-    workspace: ID!
+    workspace: WorkspaceResponse!
 
-    tasks: [Task!]
+    tasksCount: Int
 
 }
 
@@ -78,11 +79,44 @@ type AuthResponse {
     expiresIn: Int!
 }
 
+input CreateTaskAssigneeInput {
+    taskId: Int!
+    userId: ID!
+}
+
+type TaskAssigneeResponse {
+    task: TaskResponse
+    user: User
+}
+
 type WorkspaceResponse {
     id: ID!
     name: String!
     owner: User!
-    memberCount: Int!
+    memberCount: Int
+    projectCount: Int
+}
+
+type WorkspaceMemberResponse {
+    id: Int!
+    user: User
+    workspace:WorkspaceResponse
+    role: Role
+}
+
+type WorkSpaceDetailResponse {
+    id: ID!
+    name: String!
+    owner: User!
+    memberCount: Int
+    projects: [ProjectSimpleResponse]
+}
+
+type ProjectSimpleResponse{
+    id: Int
+    name:String
+    description:String
+    tasksCount:Int
 }
 
 
@@ -107,26 +141,59 @@ input CreateProjectInput {
     taskIds: [ID]
 }
 
+input CreateTaskInput {
+    title: String!
+    projectId: ID!
+    status: TaskStatus!
+    priority: TaskPriority!
+    description: String
 
+
+}
+
+input EditTaskInput{
+    title: String
+    status: TaskStatus
+    priority: TaskPriority
+    description: String
+}
+
+
+input EditProjectInput {
+    name: String
+    description: String
+    taskIds: [ID!]
+}
 
 type Query {
     userList: [User]
 
     workspaceList: [WorkspaceResponse]
 
-    workspace(id: ID!): WorkspaceResponse
+    workspace(id: ID!): WorkSpaceDetailResponse
 
     user(id: ID!): User
 
     me: User
 
-    getMembersAndRoles: [WorkspaceMember!]!
+    getMembersAndRoles: [WorkspaceMemberResponse!]!
 
-    getWorkspaceMembers(workspaceId: ID!) : [WorkspaceMember!]!
+    getWorkspaceMembers(workspaceId: ID!) : [WorkspaceMemberResponse!]!
 
-    getMemberWorkspaces(memberId: ID!) : [WorkspaceMember!]!
+    getMemberWorkspaces(memberId: ID!) : [WorkspaceMemberResponse!]!
 
-    allProjects: [Project]
+    allProjects: [ProjectResponse]
+
+    getProjectById(id: Int!): ProjectResponse
+
+    getProjectByWorkspace(workspaceId: ID!): [ProjectResponse!]
+
+    allTasks: [TaskResponse]
+
+    getTask(id: Int!): TaskResponse
+
+    getTasksByProjectId(projectId: Int!): [TaskResponse!]
+
 
 }
 
@@ -144,8 +211,20 @@ type Mutation {
 
     removeWorkspace(workspaceId: ID!): Boolean
 
-    createProject(createProjectInput: CreateProjectInput!): Project
+    createProject(createProjectInput: CreateProjectInput!): ProjectResponse
 
     refreshToken(token: String!): AuthResponse
+
+    createTask(taskInput: CreateTaskInput): TaskResponse
+
+    editTask(taskId: Int!, editTaskInput: EditTaskInput): TaskResponse
+
+    editProject(projectId:Int! ,editProjectInput: EditProjectInput):ProjectResponse
+
+    deleteTask(taskId: Int!): Boolean
+
+    deleteProject(projectId: Int!): Boolean
+
+    createAssignation(taskAssigneeInput: CreateTaskAssigneeInput):TaskAssigneeResponse
 
 }

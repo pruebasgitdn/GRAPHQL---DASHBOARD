@@ -2,22 +2,21 @@ package com.back.entities;
 
 import com.back.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 
 @Entity
-@Data
 @Table(name = "WorkspaceMember",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id","workspace_id"})})
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"user", "workspace"})
+@Getter
+@Setter
 public class WorkspaceMember {
 
     @Id

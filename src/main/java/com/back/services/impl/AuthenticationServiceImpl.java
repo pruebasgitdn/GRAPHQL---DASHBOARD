@@ -7,6 +7,7 @@ import com.back.exceptions.UserNotFoundException;
 import com.back.repositories.UserRepository;
 import com.back.services.AuthenticationService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -129,22 +130,29 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
 
-    private Claims extractClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigninKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+    private Claims extractClaimsAllowExpired(String token) {
+        
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSigninKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        }catch (ExpiredJwtException ex){
+            return ex.getClaims();
+        }
+        
+      
     }
 
     @Override
     public boolean isAccessToken(String token) {
-        return "access".equals(extractClaims(token).get("type"));
+        return "access".equals(extractClaimsAllowExpired(token).get("type"));
     }
 
     @Override
     public boolean isRefreshToken(String token) {
-        return "refresh".equals(extractClaims(token).get("type"));
+        return "refresh".equals(extractClaimsAllowExpired(token).get("type"));
     }
 
     @Override
@@ -155,8 +163,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         //Extrar subject email q fue con lo q se firmo
-        Claims claims = extractClaims(token);
+        Claims claims = extractClaimsAllowExpired(token);
         String email = claims.getSubject();
+
+        //Validar expiracion
+        Date exp = claims.getExpiration();
+        if(exp.before(new Date())){
+            throw new RuntimeException("Refresh token expirado, inicia sesion de nuevo");
+        }
 
         //Y encontrar los datos de ese perol por el gmail para setearlo
         //Si sabe

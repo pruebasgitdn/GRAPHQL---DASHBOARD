@@ -1,6 +1,8 @@
 package com.back.controllers;
 import com.back.entities.*;
-import com.back.entities.dto.CreateProjectInput;
+import com.back.entities.dto.*;
+import com.back.entities.mappers.TasksMapper;
+import com.back.entities.mappers.WorkspaceMapper;
 import com.back.security.UserDetailsImpl;
 import com.back.services.ProjectService;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +25,13 @@ import java.util.UUID;
 public class GraphQLProjectController {
 
     private final ProjectService projectService;
+    private final WorkspaceMapper workspaceMapper;
+    private final TasksMapper tasksMapper;
 
     @PreAuthorize("isAuthenticated()")
     @MutationMapping(name = "createProject")
-    public Project createProject(@Argument(name = "createProjectInput") CreateProjectInput createProjectInput,
-                                 @AuthenticationPrincipal UserDetailsImpl authenticated
+    public ProjectResponse createProject(@Argument(name = "createProjectInput") CreateProjectInput createProjectInput,
+                                         @AuthenticationPrincipal UserDetailsImpl authenticated
 
     ){
         if(authenticated == null){
@@ -38,23 +42,49 @@ public class GraphQLProjectController {
     }
 
     @QueryMapping(name = "allProjects")
-    public List<Project> allProjects()
+    public List<ProjectResponse> allProjects()
     {
-
         return projectService.allProjects();
     }
 
 
-    @SchemaMapping(typeName = "Project", field = "workspace")
-    public Workspace workspace(Project project) {
-        return project.getWorkspace();
+    @MutationMapping(name = "editProject")
+    public ProjectResponse editProject(@Argument EditProjectInput editProjectInput,
+                                       @Argument Long projectId
+                                       ) {
+        return projectService.editProject(projectId,editProjectInput);
     }
 
-    @SchemaMapping(typeName = "Project", field = "tasks")
-    public List<Task> task(Project project) {
-        return project.getTasks();
+    @MutationMapping(name = "deleteProject")
+    public Boolean deleteProject(@Argument Long projectId
+    ) {
+        return projectService.deleteProject(projectId);
     }
 
+
+
+    @QueryMapping(name = "getProjectById")
+    public ProjectResponse getProjectById(@Argument(name = "id") Long id ){
+        return projectService.getProject(id);
+    }
+
+    @QueryMapping(name = "getProjectByWorkspace")
+    public List<ProjectResponse> getProjectByWorkspace(@Argument(name = "workspaceId") UUID id ){
+        return projectService.findAllByWorkspaceId(id);
+    }
+
+
+
+
+    //comentada la vuelta porque ya el dto devuelve sus respectivas relaciones
+//    @SchemaMapping(typeName = "Project", field = "workspace")
+//    public WorkspaceResponse workspace(Project project) {
+//        return workspaceMapper.toResponse(project.getWorkspace());
+//    }
+//    @SchemaMapping(typeName = "Project", field = "tasks")
+//    public List<TaskResponse> tasks(Project project) {
+//        return tasksMapper.mapTasks(project.getTasks());
+//    }
 
 
 

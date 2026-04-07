@@ -1,9 +1,6 @@
 package com.back.entities;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -11,10 +8,12 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"tasks", "workspace_id"})
+@Getter
+@Setter
 public class Project {
 
 
@@ -22,7 +21,7 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false)
     private String name;
 
     private String description;
@@ -32,10 +31,9 @@ public class Project {
     @JoinColumn(name = "workspace_id", nullable = false)
     private Workspace workspace;
 
-
-    @OneToMany(mappedBy ="project",cascade = CascadeType.ALL)
+    @Builder.Default
+    @OneToMany(mappedBy ="project",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Task> tasks = new ArrayList<>();
-
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

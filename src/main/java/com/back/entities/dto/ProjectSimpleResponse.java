@@ -1,26 +1,18 @@
 package com.back.entities.dto;
 
-
-import com.back.entities.Workspace;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProjectResponse {
+public class ProjectSimpleResponse {
 
     private Long id;
     private String name;
     private String description;
-    
-    private WorkspaceResponse workspace;
-
     private Long tasksCount;
-
 }

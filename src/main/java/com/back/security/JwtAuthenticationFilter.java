@@ -25,50 +25,48 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        try{
+        try {
             //Extraer de los headers
             String token = extractToken(request);
 
-            if(token != null){
-
-                if (authenticationService.isAccessToken(token)) {
-                    UserDetails userDetails = authenticationService.validateToken(token);
+            if (token != null && authenticationService.isAccessToken(token)) {
 
 
-                    //autenticacion de spring
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                            userDetails, //principal: user authenticado
-                            null,
-                            userDetails.getAuthorities()
-                    );
+                UserDetails userDetails = authenticationService.validateToken(token);
 
-                    // aplicar la autenticaion al request
-                    // user autenticatdo => setearlo al contexto de autenticacion
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                    //info extra => si es instancia de tan (si pq implemta la interfaz)
-                    //se setea en el request info extra de userId
-                    if (userDetails instanceof UserDetailsImpl) {
-                        UUID id = ((UserDetailsImpl) userDetails).getId();
-                        request.setAttribute("user_id", id);
-                        log.info("user_id en el atributte request: {}", id);
+                //autenticacion de spring
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, //principal: user authenticado
+                        null,
+                        userDetails.getAuthorities()
+                );
 
-                    }
+                // aplicar la autenticaion al request
+                // user autenticatdo => setearlo al contexto de autenticacion
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                //info extra => si es instancia de tan (si pq implemta la interfaz)
+                //se setea en el request info extra de userId
+                if (userDetails instanceof UserDetailsImpl) {
+                    UUID id = ((UserDetailsImpl) userDetails).getId();
+                    request.setAttribute("user_id", id);
+                    log.info("user_id en el atributte request: {}", id);
+
                 }
-
             }
 
 
-        }catch (
-             io.jsonwebtoken.ExpiredJwtException ex
-        ){
+        } catch (
+                io.jsonwebtoken.ExpiredJwtException ex
+        ) {
             log.warn("Token expirado, inicie sesion de nuevo");
 
             SecurityContextHolder.clearContext();
 
 
-        }catch (Exception ex){
-            log.warn("Excepcion filtro de Autorizacion: "+ex);
+        } catch (Exception ex) {
+            log.warn("Excepcion filtro de Autorizacion: " + ex);
             SecurityContextHolder.clearContext();
 
         }

@@ -2,7 +2,9 @@ package com.back.services.impl;
 
 import com.back.entities.User;
 import com.back.entities.dto.UserInput;
+import com.back.entities.dto.UserResponse;
 import com.back.entities.mappers.UserMapper;
+import com.back.exceptions.ItemNotFoundException;
 import com.back.repositories.UserRepository;
 import com.back.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +25,10 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
 
+
+
     @Override
-    public User registerUser(UserInput user) {
+    public UserResponse registerUser(UserInput user) {
 
         //Encontrar por email
          Optional<User> userExist = userRepository.findByEmail(user.getEmail());
@@ -37,17 +41,39 @@ public class UserServiceImpl implements UserService {
          //Mapper, codificar contraseña y retornar lo guardado
          User userToSave = userMapper.toEntity(user);
          userToSave.setPassword(passwordEncoder.encode(userToSave.getPassword()));
-         return userRepository.save(userToSave);
 
+         userRepository.save(userToSave);
+
+         return UserResponse.builder()
+                 .id(userToSave.getId())
+                 .name(userToSave.getName())
+                 .email(userToSave.getEmail())
+                 .profilePic(userToSave.getProfilePic())
+                 .build();
     }
 
     @Override
-    public Optional<User> findById(UUID id) {
-        return userRepository.findById(id);
-    }
+    public UserResponse findById(UUID id) {
+
+        Optional<User> uExist = userRepository.findById(id);
+
+        if(uExist.isPresent()){
+            return UserResponse.builder()
+                    .id(uExist.get().getId())
+                    .name(uExist.get().getName())
+                    .email(uExist.get().getEmail())
+                    .profilePic(uExist.get().getProfilePic())
+                    .build();
+        }
+        throw  new ItemNotFoundException("User no encontrado");
+
+         }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<UserResponse> findAll() {
+
+        List<User> allU = userRepository.findAll();
+
+        return userMapper.mapUsers(allU);
     }
 }

@@ -2,6 +2,7 @@ package com.back.controllers;
 import com.back.entities.User;
 import com.back.entities.dto.CreateWorkspaceInput;
 import com.back.entities.dto.UserInput;
+import com.back.entities.dto.WorkSpaceDetailResponse;
 import com.back.entities.dto.WorkspaceResponse;
 import com.back.repositories.UserRepository;
 import com.back.security.UserDetailsImpl;
@@ -48,7 +49,7 @@ public class GraphQLWorkspaceController {
     }
 
     @QueryMapping(name = "workspace")
-    public WorkspaceResponse workspace(@Argument(name = "id") UUID id ){
+    public WorkSpaceDetailResponse workspace(@Argument(name = "id") UUID id ){
         return workspaceService.findById(id);
     }
 
@@ -101,7 +102,8 @@ public class GraphQLWorkspaceController {
     }
 
 
-
+    //El de editar name porque sus relaciones se manejan desde los servicios
+    //De sus respectivas entidades
 
 
 

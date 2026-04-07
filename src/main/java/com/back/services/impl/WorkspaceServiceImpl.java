@@ -5,11 +5,14 @@ import com.back.entities.Workspace;
 import com.back.entities.WorkspaceMember;
 import com.back.entities.dto.CreateProjectInput;
 import com.back.entities.dto.CreateWorkspaceInput;
+import com.back.entities.dto.WorkSpaceDetailResponse;
 import com.back.entities.dto.WorkspaceResponse;
 import com.back.entities.mappers.WorkspaceMapper;
 import com.back.enums.Role;
+import com.back.exceptions.AlreadyExistException;
 import com.back.exceptions.ItemNotFoundException;
 import com.back.exceptions.UserNotFoundException;
+import com.back.repositories.ProjectRepository;
 import com.back.repositories.UserRepository;
 import com.back.repositories.WorkspaceMemberRepository;
 import com.back.repositories.WorkspaceRepository;
@@ -33,7 +36,9 @@ import java.util.stream.Collectors;
 public class WorkspaceServiceImpl implements WorkspaceService {
 
     private final WorkspaceRepository workspaceRepository;
+
     private final WorkspaceMemberRepository workspaceMemberRepository;
+    private final ProjectRepository projectRepository;
     private final WorkspaceMemberService workspaceMemberService;
     private final UserRepository userRepository;
 
@@ -47,6 +52,10 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         User owner = userRepository.findById(owner_id).orElseThrow(()->{
             throw new UserNotFoundException();
         });
+
+        if(workspaceRepository.existsByNameAndOwner_Id(workspaceInput.getName(),owner_id)){
+            throw new AlreadyExistException("Ya tienes un workspace con ese nombre");
+        }
 
         // Crear Workspace
         Workspace workspace = Workspace.builder()
@@ -71,40 +80,39 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         //Si se crear asocialro al wspace
 
 
+        // porque se crea vacio y adentro se añade el proyecto
+        // Que dicha accion se ejecuta es en el servicio del proyect
         workspaceRepository.save(workspace);
-        return  WorkspaceResponse.builder()
-                .id(workspace.getId())
-                .name(workspace.getName())
-                .ownerId(owner.getId())
-                .build();
+
+        return  workspaceMapper.toResponseWithoutCount(workspace);
     }
 
     @Override
     public List<WorkspaceResponse> findAll() {
 
-        return workspaceRepository.findAll()
+
+                return workspaceRepository.findAll()
                 .stream()
-                .map(workspaceMapper::toResponse)
+                .map(p ->{
+                    Long memberCount = workspaceMemberRepository.countByWorkspaceId(p.getId());
+                    Long projectCount = projectRepository.countByWorkspaceId(p.getId());
+                    return workspaceMapper.toResponse(p,memberCount,projectCount);
+                })
                 .toList();
+
 
     }
 
     @Override
-    public WorkspaceResponse findById(UUID id) {
+    public WorkSpaceDetailResponse findById(UUID id) {
 
         Workspace workspace = workspaceRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Espacio de trabajo no encontrado por el id: " + id));
 
-        long count = workspaceMemberRepository.countByWorkspaceId(id);
+        long memberCount = workspaceMemberRepository.countByWorkspaceId(workspace.getId());
+        //long projectCount = projectRepository.countByWorkspaceId(workspace.getId());
 
-        log.debug("DBG",count);
-
-        return WorkspaceResponse.builder()
-                .id(workspace.getId())
-                .name(workspace.getName())
-                .ownerId(workspace.getOwner().getId())
-                .memberCount(count)
-                .build();
+        return  workspaceMapper.toDetailResponse(workspace,memberCount);
     }
 
 
@@ -164,8 +172,12 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         //  guardar los miembros en el espacio de trabajo
         workspace.getMembers().addAll(newMembers);
 
+
+        Long projectCount = projectRepository.countByWorkspaceId(workspace.getId());
+        Long memberCount =  workspaceMemberRepository.countByWorkspaceId(workspace.getId());
+
         // Retornar
-        return workspaceMapper.toResponse(workspace);
+        return workspaceMapper.toResponse(workspace,memberCount,projectCount);
     }
 
     @Override
@@ -211,7 +223,11 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                 uniqueUserIds.contains(wm.getUser().getId())
         );
 
-        return workspaceMapper.toResponse(workspace);
+        long memberCount = workspaceMemberRepository.countByWorkspaceId(workspace.getId());
+        long projectCount = projectRepository.countByWorkspaceId(workspace.getId());
+
+
+        return workspaceMapper.toResponse(workspace,memberCount,projectCount);
     }
 
     @Transactional

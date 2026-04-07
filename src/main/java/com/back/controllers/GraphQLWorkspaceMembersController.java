@@ -2,6 +2,7 @@ package com.back.controllers;
 import com.back.entities.User;
 import com.back.entities.Workspace;
 import com.back.entities.WorkspaceMember;
+import com.back.entities.dto.WorkspaceMemberResponse;
 import com.back.entities.dto.WorkspaceMembersResponse;
 import com.back.entities.dto.WorkspaceResponse;
 import com.back.exceptions.ItemNotFoundException;
@@ -34,9 +35,7 @@ public class GraphQLWorkspaceMembersController {
 
 
     @QueryMapping(name = "getMembersAndRoles")
-    public List<WorkspaceMember> workspaceMembers(){
-        List<WorkspaceMember> ee =  workspaceMemberService.findAll();
-
+    public List<WorkspaceMemberResponse> workspaceMembers(){
 
         return  workspaceMemberService.findAll();
     }
@@ -54,13 +53,13 @@ public class GraphQLWorkspaceMembersController {
 
 
     @QueryMapping(name = "getWorkspaceMembers")
-    public List<WorkspaceMember> getWorkspaceMembers(@Argument(name = "workspaceId") UUID workspaceId){
+    public List<WorkspaceMemberResponse> getWorkspaceMembers(@Argument(name = "workspaceId") UUID workspaceId){
         return  workspaceMemberService.getWorkspaceUsers(workspaceId);
     }
 
 
     @QueryMapping(name = "getMemberWorkspaces")
-    public List<WorkspaceMember> getMemberWorkspaces(@Argument(name = "memberId") UUID memberId){
+    public List<WorkspaceMemberResponse> getMemberWorkspaces(@Argument(name = "memberId") UUID memberId){
         return  workspaceMemberService.getUserWorkspaces(memberId);
     }
 

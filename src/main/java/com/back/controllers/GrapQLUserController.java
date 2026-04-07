@@ -1,6 +1,7 @@
 package com.back.controllers;
 import com.back.entities.User;
 import com.back.entities.dto.UserInput;
+import com.back.entities.dto.UserResponse;
 import com.back.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,18 +25,18 @@ public class GrapQLUserController {
 
 
     @MutationMapping(name = "registerUser")
-    public User registerUser(@Valid @Argument UserInput user){
+    public UserResponse registerUser(@Valid @Argument UserInput user){
         return userService.registerUser(user);
     }
 
     @QueryMapping(name = "userList")
-    public List<User> userList(){
+    public List<UserResponse> userList(){
         return userService.findAll();
     }
 
 
     @QueryMapping(name = "user")
-    public Optional<User> user(@Argument(name =  "id") UUID id){
+    public UserResponse user(@Argument(name =  "id") UUID id){
         return userService.findById(id);
     }
 

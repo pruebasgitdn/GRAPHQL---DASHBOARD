@@ -1,9 +1,7 @@
 package com.back.entities;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.OnDelete;
 
 import java.time.LocalDateTime;
 
@@ -11,10 +9,11 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "task_assignees",
         uniqueConstraints = @UniqueConstraint(columnNames = {"task_id", "user_id"}))
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class TaskAssignee {
 
     @Id

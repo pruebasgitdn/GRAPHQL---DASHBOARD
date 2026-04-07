@@ -1,26 +1,29 @@
 package com.back.entities.dto;
 
 
+import com.back.entities.User;
 import com.back.entities.Workspace;
+import com.back.enums.Role;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProjectResponse {
+public class WorkspaceMemberResponse {
 
     private Long id;
-    private String name;
-    private String description;
-    
+
+    private UserResponse user;
+
     private WorkspaceResponse workspace;
 
-    private Long tasksCount;
+    private Role role;
+
+
 
 }

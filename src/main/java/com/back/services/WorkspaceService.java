@@ -4,6 +4,7 @@ package com.back.services;
 import com.back.entities.Workspace;
 import com.back.entities.dto.CreateProjectInput;
 import com.back.entities.dto.CreateWorkspaceInput;
+import com.back.entities.dto.WorkSpaceDetailResponse;
 import com.back.entities.dto.WorkspaceResponse;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public interface WorkspaceService {
 
     List<WorkspaceResponse> findAll();
 
-    WorkspaceResponse findById(UUID id);
+    WorkSpaceDetailResponse findById(UUID id);
 
     WorkspaceResponse addMemberToWorkspace(List<UUID> users, UUID workspace_id,UUID owner_id);
 
