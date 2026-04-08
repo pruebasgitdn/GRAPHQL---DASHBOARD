@@ -12,6 +12,7 @@ import com.back.repositories.WorkspaceRepository;
 import com.back.services.WorkspaceMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,6 +37,7 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
         );
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<WorkspaceMemberResponse> findAll() {
 
@@ -47,6 +49,7 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<WorkspaceMemberResponse> getUserWorkspaces(UUID user_id) {
 
@@ -61,6 +64,7 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<WorkspaceMemberResponse> getWorkspaceUsers(UUID workspace_id) {
 
         workspaceRepository.findById(workspace_id)
@@ -72,5 +76,10 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
                 .map(workspaceMemberMapper::toResponse)
                 .collect(Collectors.toList());
 
+    }
+
+    @Override
+    public boolean isMember(UUID workspaceId, UUID userId) {
+        return workspaceMemberRepository.existsByWorkspace_IdAndUser_Id(workspaceId,userId);
     }
 }

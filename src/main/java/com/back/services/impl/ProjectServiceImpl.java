@@ -6,23 +6,23 @@ import com.back.entities.Workspace;
 import com.back.entities.dto.CreateProjectInput;
 import com.back.entities.dto.EditProjectInput;
 import com.back.entities.dto.ProjectResponse;
-import com.back.entities.dto.WorkspaceResponse;
+import com.back.entities.dto.WorkSpaceDetailResponse;
 import com.back.entities.mappers.ProjectMapper;
 import com.back.entities.mappers.TasksMapper;
+import com.back.entities.mappers.UserMapper;
 import com.back.entities.mappers.WorkspaceMapper;
 import com.back.exceptions.AlreadyExistException;
-import com.back.exceptions.GraphQLExceptionHandler;
 import com.back.exceptions.ItemNotFoundException;
 import com.back.repositories.ProjectRepository;
 import com.back.repositories.TasksRepository;
 import com.back.repositories.WorkspaceRepository;
 import com.back.services.ProjectService;
+import com.back.services.WorkspaceService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,10 +30,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
     private final WorkspaceRepository workspaceRepository;
+    private final WorkspaceService workspaceService;
     private final TasksRepository tasksRepository;
 
     private final TasksMapper tasksMapper;
     private final WorkspaceMapper workspaceMapper;
+    private final UserMapper userMapper;
     private final ProjectMapper projectMapper;
 
 
@@ -61,7 +63,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
 
-        //Crear pryecto y retornar
+        //Crear pryecto,guardar y retornar
         Project project = Project
                 .builder()
                 .name(projectInput.getName())
@@ -71,18 +73,12 @@ public class ProjectServiceImpl implements ProjectService {
                 .build();
 
          projectRepository.save(project);
-
          Long countTasks = tasksRepository.countByProjectId(project.getId());
 
-
-        return  ProjectResponse.builder()
-                .id(project.getId())
-                .description(project.getDescription())
-                .workspace(workspaceMapper.toResponseWithoutCount(project.getWorkspace()))
-                .tasksCount(countTasks)
-                .build();
+        return  projectMapper.toResponseWithTasksCount(project,countTasks);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ProjectResponse> allProjects() {
 
@@ -95,11 +91,12 @@ public class ProjectServiceImpl implements ProjectService {
         return projects.stream()
                 .map(pro -> {
                     Long count = tasksRepository.countByProjectId(pro.getId());
-                    return projectMapper.toResponse(pro,count);
+                    return projectMapper.toResponseWithTasksCount(pro,count);
                 }).toList();
 
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ProjectResponse getProject(Long id) {
         Project project = projectRepository.findById(id).orElseThrow(()->{
@@ -108,7 +105,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Long count = tasksRepository.countByProjectId(project.getId());
 
-        return projectMapper.toResponse(project,count);
+        return projectMapper.toResponseWithTasksCount(project,count);
     }
 
     @Override
@@ -124,7 +121,7 @@ public class ProjectServiceImpl implements ProjectService {
         return projectList.stream()
                 .map(pro -> {
                     Long count = tasksRepository.countByProjectId(pro.getId());
-                    return projectMapper.toResponse(pro,count);
+                    return projectMapper.toResponseWithTasksCount(pro,count);
                 }).toList();
 
     }
@@ -153,7 +150,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Long count = tasksRepository.countByProjectId(project.getId());
 
-        return projectMapper.toResponse(project,count);
+        return projectMapper.toResponseWithTasksCount(project,count);
     }
 
     @Override

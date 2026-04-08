@@ -34,25 +34,50 @@ public class GrapQLTaskAssigneeController {
 
         UUID user_id = authenticated.getId();
 
-
         return  taskAssigneeService.createAssignation(taskAssigneeInput.getTaskId()
                 ,taskAssigneeInput.getUserId(),user_id);
 
 
     }
 
-        // Obtener todas las asignaciones
+    // Obtener todas las asignaciones
+    @QueryMapping(name = "allAssignations")
+    public List<TaskAssigneeResponse> allAssignations() {
+
+        return  taskAssigneeService.allAssignations();
+
+    }
+
 
     // Obtener todas las asignaciones por user_id
+    @QueryMapping(name = "assignationsByUserId")
+    public List<TaskAssigneeResponse> assignationsByUserId(@Valid @Argument UUID userId) {
+
+        return  taskAssigneeService.assignationsByUserId(userId);
+
+    }
 
     // Obtener todas las asignaciones por task_id
+    @QueryMapping(name = "assignationsByTaskId")
+    public List<TaskAssigneeResponse> assignationsByTaskId(@Valid @Argument Long taskId) {
+
+        return  taskAssigneeService.assignationsByTaskId(taskId);
+
+    }
 
     // Eliminar asignacion
+    @PreAuthorize("isAuthenticated()")
+    @QueryMapping(name = "deleteAssignationByTaskId")
+    public Boolean deleteAssignationByTaskId(@Valid @Argument Long taskId,
+            @AuthenticationPrincipal UserDetailsImpl authenticated
+    ){
 
-//    @QueryMapping(name = "getMembersAndRoles")
-//    public List<WorkspaceMemberResponse> workspaceMembers(){
-//
-//        return  workspaceMemberService.findAll();
-//    }
+        if(authenticated == null){
+            throw new AuthenticationCredentialsNotFoundException("No se econtraron las credenciales de autenticacion");
+
+        }
+
+        return  taskAssigneeService.deleteAssignationByTaskId(taskId,authenticated.getId());
+    }
 
 }

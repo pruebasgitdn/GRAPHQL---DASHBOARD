@@ -2,11 +2,8 @@ package com.back.entities.mappers;
 
 
 import com.back.entities.Project;
-import com.back.entities.Task;
 import com.back.entities.dto.EditProjectInput;
-import com.back.entities.dto.EditTaskInput;
 import com.back.entities.dto.ProjectResponse;
-import com.back.entities.dto.TaskResponse;
 import com.back.repositories.TasksRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +19,7 @@ public class ProjectMapper {
     private final WorkspaceMapper workspaceMapper;
     private final TasksRepository tasksRepository;
 
-    public ProjectResponse toResponse(Project project,Long taskCount) {
+    public ProjectResponse toResponseWithTasksCount(Project project, Long taskCount) {
         return ProjectResponse.builder()
                 .id(project.getId())
                 .name(project.getName())

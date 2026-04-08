@@ -1,5 +1,6 @@
 package com.back.entities.mappers;
 
+import com.back.entities.Project;
 import com.back.entities.User;
 import com.back.entities.Workspace;
 import com.back.entities.dto.*;
@@ -15,6 +16,8 @@ import java.util.List;
 @Slf4j
 public class WorkspaceMapper {
 
+
+    private final UserMapper userMapper;
     private final WorkspaceMemberRepository workspaceMemberRepository;
 
     public WorkspaceResponse toResponseWithoutCount(Workspace workspace) {
@@ -62,11 +65,37 @@ public class WorkspaceMapper {
         return WorkSpaceDetailResponse.builder()
                 .id(workspace.getId())
                 .name(workspace.getName())
-                .owner(workspace.getOwner())
+                .owner(userMapper.toResponse(workspace.getOwner()))
                 .memberCount(memberCount)
                 .projects(projects)
                 .build();
     }
+
+    public Workspace fromDetailRespToEntity(WorkSpaceDetailResponse dto, User owner) {
+
+
+        Workspace workspace = Workspace.builder()
+                .id(dto.getId())
+                .name(dto.getName())
+                .owner(owner)
+                .build();
+
+        if (dto.getProjects() != null) {
+            List<Project> projects = dto.getProjects().stream()
+                    .map(p -> Project.builder()
+                            .id(p.getId())
+                            .name(p.getName())
+                            .description(p.getDescription())
+                            .workspace(workspace)
+                            .build())
+                    .toList();
+
+            workspace.setProjects(projects);
+        }
+
+        return workspace;
+    }
+
 
 }
 

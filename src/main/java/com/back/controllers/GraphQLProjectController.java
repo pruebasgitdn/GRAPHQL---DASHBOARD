@@ -79,7 +79,7 @@ public class GraphQLProjectController {
     //comentada la vuelta porque ya el dto devuelve sus respectivas relaciones
 //    @SchemaMapping(typeName = "Project", field = "workspace")
 //    public WorkspaceResponse workspace(Project project) {
-//        return workspaceMapper.toResponse(project.getWorkspace());
+//        return workspaceMapper.toResponseWithTasksCount(project.getWorkspace());
 //    }
 //    @SchemaMapping(typeName = "Project", field = "tasks")
 //    public List<TaskResponse> tasks(Project project) {

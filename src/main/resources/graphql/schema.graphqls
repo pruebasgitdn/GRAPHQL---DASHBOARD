@@ -64,8 +64,6 @@ type WorkspaceMember {
 }
 
 
-
-
 input CreateWorkspaceInput {
     name: String!
 }
@@ -95,6 +93,13 @@ type WorkspaceResponse {
     owner: User!
     memberCount: Int
     projectCount: Int
+}
+
+type WorkspaceSimpleResponse {
+    id: ID!
+    name: String!
+    owner: User!
+
 }
 
 type WorkspaceMemberResponse {
@@ -193,6 +198,14 @@ type Query {
     getTask(id: Int!): TaskResponse
 
     getTasksByProjectId(projectId: Int!): [TaskResponse!]
+
+    allAssignations: [TaskAssigneeResponse!]
+
+    assignationsByUserId(userId: ID!): [TaskAssigneeResponse!]
+
+    assignationsByTaskId(taskId: Int!): [TaskAssigneeResponse!]
+
+    deleteAssignationByTaskId(taskId: Int!): Boolean
 
 
 }

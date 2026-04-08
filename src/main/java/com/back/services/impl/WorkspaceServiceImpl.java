@@ -18,10 +18,10 @@ import com.back.repositories.WorkspaceMemberRepository;
 import com.back.repositories.WorkspaceRepository;
 import com.back.services.WorkspaceMemberService;
 import com.back.services.WorkspaceService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -87,6 +87,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         return  workspaceMapper.toResponseWithoutCount(workspace);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<WorkspaceResponse> findAll() {
 
@@ -102,6 +103,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
 
     }
+
+
 
     @Override
     public WorkSpaceDetailResponse findById(UUID id) {

@@ -17,6 +17,7 @@ import com.back.repositories.TasksRepository;
 import com.back.services.TasksService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,16 +59,12 @@ public class TasksServiceImpl implements TasksService {
 
         tasksRepository.save(taskToSave);
 
-        return TaskResponse.builder()
-                .id(taskToSave.getId())
-                .title(taskToSave.getTitle())
-                .description(taskToSave.getDescription())
-                .project(projectMapper.toResponseWithoutCount(taskToSave.getProject()))
-                .priority(taskToSave.getPriority())
-                .status(taskToSave.getStatus())
-                .build();
+         return  tasksMapper.toResponse(taskToSave);
+
+
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<TaskResponse> findAllTasks() {
 
@@ -93,6 +90,7 @@ public class TasksServiceImpl implements TasksService {
         return tasksMapper.toResponse(task);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<TaskResponse> findAllByProjectId(Long projectId) {
 

@@ -17,7 +17,7 @@ public class WorkSpaceDetailResponse {
 
     private UUID id;
     private String name;
-    private User owner;
+    private UserResponse owner;
     private Long memberCount;
 
     private List<ProjectSimpleResponse> projects;
