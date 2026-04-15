@@ -5,6 +5,7 @@ import com.back.entities.Task;
 import com.back.entities.User;
 import com.back.entities.dto.TaskResponse;
 import com.back.entities.dto.UserInput;
+import com.back.entities.dto.UserMeResponse;
 import com.back.entities.dto.UserResponse;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +34,8 @@ public class UserMapper {
 
         return user;
     }
+
+
 
     public UserResponse toResponse(User input) {
         UserResponse userResponse = new UserResponse();

@@ -1,11 +1,15 @@
 package com.back.services.impl;
 import com.back.entities.User;
 import com.back.entities.dto.AuthResponse;
+import com.back.entities.dto.UserResponse;
+import com.back.entities.mappers.UserMapper;
 import com.back.exceptions.GraphQLExceptionHandler;
 import com.back.exceptions.InvalidCredentialsException;
 import com.back.exceptions.UserNotFoundException;
 import com.back.repositories.UserRepository;
 import com.back.services.AuthenticationService;
+import com.back.services.NotificationPublisherService;
+import com.back.services.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -35,6 +39,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
+    private final NotificationPublisherService notificationPublisher;
+    private final UserMapper userMapper;
+    private final UserService userService;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -63,6 +70,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado por el email: {}" + email));
 
+
+
+        UserResponse userResponse = userService.findById(user.getId());
+        User  userEntity = userMapper.FromResponseToEntity(userResponse);
+        //Conexion subscripcion sink
+        //notificationPublisher.subscribe(userEntity.getId().toString());
 
         return AuthResponse.builder()
                 .token(jwtToken)

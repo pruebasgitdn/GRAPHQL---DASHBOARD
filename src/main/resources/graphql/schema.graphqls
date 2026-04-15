@@ -9,6 +9,10 @@ enum Role {
     OWNER,ADMIN,MEMBER,GUEST
 }
 
+enum NotificationType{
+    ASSIGN,COMMENT,STATUS_CHANGE,MENTION
+}
+
 enum TaskStatus {
     LOW,MEDIUM,HIGH,URGENT
 }
@@ -146,6 +150,15 @@ input CreateProjectInput {
     taskIds: [ID]
 }
 
+type NotificationResponse {
+    id: Int!
+    title: String
+    message: String
+    user: User
+    type: NotificationType
+
+}
+
 input CreateTaskInput {
     title: String!
     projectId: ID!
@@ -207,6 +220,8 @@ type Query {
 
     deleteAssignationByTaskId(taskId: Int!): Boolean
 
+    allConnections: [String]
+
 
 }
 
@@ -240,4 +255,10 @@ type Mutation {
 
     createAssignation(taskAssigneeInput: CreateTaskAssigneeInput):TaskAssigneeResponse
 
+}
+
+
+
+type Subscription {
+    notifications: NotificationResponse
 }

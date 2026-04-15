@@ -1,7 +1,6 @@
 package com.back.entities.dto;
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,19 +10,15 @@ import java.util.UUID;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class UserResponse {
+@NoArgsConstructor
+public class UserMeResponse {
 
     private UUID id;
-
+    private String email;
     private String name;
-
-    private  String email;
-
-    private  String profilePic;
-
-
-
+    private String profilePic;
+    private String refreshToken;
+    private String token;
 
 }

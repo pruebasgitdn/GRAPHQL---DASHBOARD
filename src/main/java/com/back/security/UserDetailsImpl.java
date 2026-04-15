@@ -2,10 +2,11 @@ package com.back.security;
 import com.back.entities.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.Nullable;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,7 +26,7 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     @Override
-    public @Nullable String getPassword() {
+    public String getPassword() {
         return user.getPassword();
     }
 
@@ -38,7 +39,14 @@ public class UserDetailsImpl implements UserDetails {
         return user.getName();
     }
 
-    public UUID getId(){return user.getId();}
+    public UUID getId(){
+
+        if(user.getId() == null){
+            throw  new RuntimeException("Not authenticated");
+        }
+
+        return user.getId();
+    }
 
 
 }

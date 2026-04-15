@@ -1,21 +1,19 @@
 package com.back.services.impl;
 
+import com.back.entities.Notification;
 import com.back.entities.User;
 import com.back.entities.Workspace;
 import com.back.entities.WorkspaceMember;
-import com.back.entities.dto.CreateProjectInput;
-import com.back.entities.dto.CreateWorkspaceInput;
-import com.back.entities.dto.WorkSpaceDetailResponse;
-import com.back.entities.dto.WorkspaceResponse;
+import com.back.entities.dto.*;
+import com.back.entities.mappers.NotificationMapper;
 import com.back.entities.mappers.WorkspaceMapper;
+import com.back.enums.NotificationType;
 import com.back.enums.Role;
 import com.back.exceptions.AlreadyExistException;
 import com.back.exceptions.ItemNotFoundException;
 import com.back.exceptions.UserNotFoundException;
-import com.back.repositories.ProjectRepository;
-import com.back.repositories.UserRepository;
-import com.back.repositories.WorkspaceMemberRepository;
-import com.back.repositories.WorkspaceRepository;
+import com.back.repositories.*;
+import com.back.services.NotificationPublisherService;
 import com.back.services.WorkspaceMemberService;
 import com.back.services.WorkspaceService;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +34,8 @@ import java.util.stream.Collectors;
 public class WorkspaceServiceImpl implements WorkspaceService {
 
     private final WorkspaceRepository workspaceRepository;
+    private final NotificationRepository notificationRepository;
+    private final NotificationPublisherService notificationPublisher;
 
     private final WorkspaceMemberRepository workspaceMemberRepository;
     private final ProjectRepository projectRepository;
@@ -43,6 +43,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     private final UserRepository userRepository;
 
     private final WorkspaceMapper workspaceMapper;
+    private final NotificationMapper notificationMapper;
+
 
     @Transactional
     @Override
@@ -78,6 +80,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         //Opcional crear proyecto
         //Si se crear asocialro al wspace
+
 
 
         // porque se crea vacio y adentro se añade el proyecto
@@ -168,12 +171,32 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                     wm.setWorkspace(workspace);
                     wm.setUser(user);
                     wm.setRole(Role.MEMBER);
+
+
+                    //Emitir notificacion
+                    Notification notification = Notification.builder()
+                            .user(user)
+                            .title("Nuevo en espacio de trabajo")
+                            .message("Has sido añadido a un espacio de trabajo")
+                            .type(NotificationType.COMMENT)
+                            .build();
+
+                    NotificationResponse notificationResp = notificationMapper.toResponse(notification);
+
+
+                    notificationPublisher.publish(user.getId().toString(),notificationResp);
+
+                    notificationRepository.save(notification);
+
                     return wm;
                 })
                 .toList();
 
         //  guardar los miembros en el espacio de trabajo
         workspace.getMembers().addAll(newMembers);
+
+
+
 
 
         Long projectCount = projectRepository.countByWorkspaceId(workspace.getId());

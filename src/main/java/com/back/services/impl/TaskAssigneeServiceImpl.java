@@ -1,13 +1,17 @@
 package com.back.services.impl;
 
 import com.back.entities.*;
+import com.back.entities.dto.NotificationResponse;
 import com.back.entities.dto.TaskAssigneeResponse;
 import com.back.entities.dto.TaskResponse;
 import com.back.entities.dto.UserResponse;
+import com.back.entities.mappers.NotificationMapper;
 import com.back.entities.mappers.TaskAssigneeMapper;
 import com.back.entities.mappers.TasksMapper;
 import com.back.entities.mappers.UserMapper;
+import com.back.enums.NotificationType;
 import com.back.exceptions.ItemNotFoundException;
+import com.back.repositories.NotificationRepository;
 import com.back.repositories.TaskAssigneeRepository;
 import com.back.repositories.TasksRepository;
 import com.back.repositories.UserRepository;
@@ -27,6 +31,7 @@ import java.util.UUID;
 public class TaskAssigneeServiceImpl implements TaskAssigneeService {
 
     private final TaskAssigneeRepository taskAssigneeRepository;
+    private final NotificationRepository notificationRepository;
     private final TaskAssigneeMapper taskAssigneeMapper;
     private final UserService userService;
     private final UserRepository userRepository;
@@ -35,6 +40,8 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
     private final WorkspaceMemberService workspaceMemberService;
     private final TasksMapper tasksMapper;
     private final UserMapper userMapper;
+    private final NotificationPublisherService notificationPublisher;
+    private final NotificationMapper notificationMapper;
 
 
     @Override
@@ -61,6 +68,7 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
         return true;
     }
 
+    @Transactional
     @Override
     public TaskAssigneeResponse createAssignation(Long taskId, UUID user_assign, UUID currentUser) {
 
@@ -85,12 +93,30 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
         }
 
 
+        User userEntity = userMapper.FromResponseToEntity(user);
+        Task taskEntity =  tasksMapper.toEntity(taskResponse);
+
         TaskAssignee taskAssignee = TaskAssignee.builder()
-                .task(tasksMapper.toEntity(taskResponse))
-                .user(userMapper.FromResponseToEntity(user))
+                .task(taskEntity)
+                .user(userEntity)
                 .build();
 
         taskAssigneeRepository.save(taskAssignee);
+
+
+
+        //Emitir notificacion
+        NotificationResponse notification = NotificationResponse.builder()
+                .user(user)
+                .title("Tienes una nueva tarea asignada")
+                .message("Se te ha asignado una nueva tarea")
+                .type(NotificationType.ASSIGN)
+                .build();
+
+        notificationPublisher.publish(userEntity.getId().toString(),notification);
+        Notification notificationEnt  = notificationMapper.toEntity(notification);
+        notificationRepository.save(notificationEnt);
+
 
         TaskAssigneeResponse taskAssigneeResponse = TaskAssigneeResponse.builder()
                 .task(taskResponse)

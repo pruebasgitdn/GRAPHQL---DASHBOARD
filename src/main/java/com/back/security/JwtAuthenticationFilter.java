@@ -1,11 +1,13 @@
 package com.back.security;
 import com.back.services.AuthenticationService;
+import graphql.GraphQLException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,7 +26,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String path = request.getRequestURI();
 
+        if(path.contains("/auth/login")){
+            filterChain.doFilter(request,response);
+            return;
+        }
         try {
             //Extraer de los headers
             String token = extractToken(request);
@@ -60,10 +67,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (
                 io.jsonwebtoken.ExpiredJwtException ex
         ) {
-            log.warn("Token expirado, inicie sesion de nuevo");
-
-            SecurityContextHolder.clearContext();
-
+//            SecurityContextHolder.clearContext();
+//            log.warn("Token expirado, inicie sesion de nuevo");
+//            throw new CredentialsExpiredException("TOKEN_EXPIRED");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"message\": \"TOKEN_EXPIRED\"}");
+            return;
 
         } catch (Exception ex) {
             log.warn("Excepcion filtro de Autorizacion: " + ex);
@@ -94,4 +104,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return header.substring(7);
     }
 
+
+
+
 }
+
