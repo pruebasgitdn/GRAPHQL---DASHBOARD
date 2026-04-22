@@ -14,7 +14,20 @@ public class WorkspaceMemberMapper {
     private final UserMapper userMapper;
     private final WorkspaceMapper workspaceMapper;
 
-   public WorkspaceMemberResponse toResponse (WorkspaceMember workspaceMember){
+   public WorkspaceMemberResponse toResponseCount (WorkspaceMember workspaceMember,Long memberCount, Long projectCount){
+
+
+        return WorkspaceMemberResponse.builder()
+                .id(workspaceMember.getId())
+                .role(workspaceMember.getRole())
+                .user(userMapper.toResponse(workspaceMember.getUser()))
+                .workspace(workspaceMapper.toResponse((workspaceMember.getWorkspace()),memberCount,projectCount))
+                .build();
+    }
+
+    public WorkspaceMemberResponse toResponse (WorkspaceMember workspaceMember){
+
+
         return WorkspaceMemberResponse.builder()
                 .id(workspaceMember.getId())
                 .role(workspaceMember.getRole())
@@ -22,5 +35,6 @@ public class WorkspaceMemberMapper {
                 .workspace(workspaceMapper.toResponseWithoutCount((workspaceMember.getWorkspace())))
                 .build();
     }
+
 
 }

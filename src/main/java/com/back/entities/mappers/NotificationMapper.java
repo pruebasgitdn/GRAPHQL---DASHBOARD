@@ -8,6 +8,7 @@ import com.back.entities.User;
 import com.back.entities.dto.NotificationResponse;
 import com.back.entities.dto.ProjectResponse;
 import com.back.entities.dto.UserResponse;
+import com.back.entities.dto.WorkspaceResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ public class NotificationMapper {
 
     private final UserMapper userMapper;
     private final TasksMapper tasksMapper;
+    private final WorkspaceMemberMapper workspaceMemberMapper;
 
 
     public Notification toEntity(NotificationResponse notificationResponse) {
@@ -39,13 +41,14 @@ public class NotificationMapper {
     public NotificationResponse toResponse(Notification notification) {
 
         UserResponse userResp = userMapper.toResponse(notification.getUser());
-
+      // WorkspaceResponse wspaceResp = workspaceMemberMapper.toResponse(notification.get)
        return  NotificationResponse.builder()
                .id(notification.getId())
                .message(notification.getMessage())
                .title(notification.getTitle())
                .type(notification.getType())
                .user(userResp)
+               //.workspaceMemberResponse(workspaceMemberMapper.)
                .build();
     }
 

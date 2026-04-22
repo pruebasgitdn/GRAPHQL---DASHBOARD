@@ -17,4 +17,7 @@ public class NotificationResponse {
     private String message;
     private NotificationType type;
     private UserResponse user;
+
+    //optional
+    private WorkspaceMemberResponse workspaceMember;
 }

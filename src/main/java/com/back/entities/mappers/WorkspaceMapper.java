@@ -25,6 +25,7 @@ public class WorkspaceMapper {
 
         return WorkspaceResponse.builder()
                 .id(workspace.getId())
+                .color(workspace.getColor())
                 .name(workspace.getName())
                 .ownerId(workspace.getOwner().getId())
                 .build();
@@ -39,6 +40,9 @@ public class WorkspaceMapper {
                 .ownerId(workspace.getOwner().getId())
                 .memberCount(memberCount)
                 .projectCount(projectCount)
+                .createdAt(workspace.getCreatedAt())
+                .updatedAt(workspace.getUpdatedAt())
+                .color(workspace.getColor())
                 .build();
     }
 
@@ -48,6 +52,7 @@ public class WorkspaceMapper {
         return Workspace.builder()
                 .id(workspace.getId())
                 .name(workspace.getName())
+                .color(workspace.getColor())
                 .build();
     }
 
@@ -67,7 +72,10 @@ public class WorkspaceMapper {
                 .name(workspace.getName())
                 .owner(userMapper.toResponse(workspace.getOwner()))
                 .memberCount(memberCount)
+                .createdAt(workspace.getCreatedAt())
+                .updatedAt(workspace.getUpdatedAt())
                 .projects(projects)
+                .color(workspace.getColor())
                 .build();
     }
 

@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 @Data
@@ -24,12 +25,11 @@ public class CreateWorkspaceInput {
     @Size(max = 40,message = "Máximo 40 caracteres" )
     private String name;
 
+    
+    private List<UUID> members_id = new ArrayList<>();
 
-//
-//    private List<WorkspaceMember> members = new ArrayList<>();
-//
-//    private List<Project> projects = new ArrayList<>();
-
+    @Size(max = 7,min = 7,message = "Ingrese un codigo hexadecimal valido" )
+    private String color;
 
 
 

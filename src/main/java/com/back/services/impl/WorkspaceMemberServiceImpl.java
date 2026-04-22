@@ -6,6 +6,7 @@ import com.back.entities.dto.WorkspaceMembersResponse;
 import com.back.entities.mappers.WorkspaceMemberMapper;
 import com.back.enums.Role;
 import com.back.exceptions.ItemNotFoundException;
+import com.back.repositories.ProjectRepository;
 import com.back.repositories.UserRepository;
 import com.back.repositories.WorkspaceMemberRepository;
 import com.back.repositories.WorkspaceRepository;
@@ -26,7 +27,7 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
     private final WorkspaceRepository workspaceRepository;
     private final UserRepository userRepository;
     private final WorkspaceMemberMapper workspaceMemberMapper;
-
+    private final ProjectRepository projectRepository;
 
     @Override
     public boolean isAdminOrOwner(UUID user_id, UUID workspace_id) {
@@ -58,8 +59,20 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
 
         List<WorkspaceMember> workspaceMembers =  workspaceMemberRepository.findAllByUserId(user_id);
 
+        //contar miemrbso y projects para pasarlos
+//        return workspaceMembers.stream()
+//                .map(workspaceMemberMapper::toResponse)
+//                .collect(Collectors.toList());
+
         return workspaceMembers.stream()
-                .map(workspaceMemberMapper::toResponse)
+                .map(wm -> {
+                    UUID workspaceId = wm.getWorkspace().getId();
+
+                    Long projectCount = projectRepository.countByWorkspaceId(workspaceId);
+                    Long memberCount = workspaceMemberRepository.countByWorkspaceId(workspaceId);
+
+                    return workspaceMemberMapper.toResponseCount(wm, memberCount,projectCount);
+                })
                 .collect(Collectors.toList());
     }
 

@@ -7,12 +7,14 @@ import com.back.entities.WorkspaceMember;
 import com.back.entities.dto.*;
 import com.back.entities.mappers.NotificationMapper;
 import com.back.entities.mappers.WorkspaceMapper;
+import com.back.entities.mappers.WorkspaceMemberMapper;
 import com.back.enums.NotificationType;
 import com.back.enums.Role;
 import com.back.exceptions.AlreadyExistException;
 import com.back.exceptions.ItemNotFoundException;
 import com.back.exceptions.UserNotFoundException;
 import com.back.repositories.*;
+import com.back.services.HexColorGenerator;
 import com.back.services.NotificationPublisherService;
 import com.back.services.WorkspaceMemberService;
 import com.back.services.WorkspaceService;
@@ -44,7 +46,9 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     private final WorkspaceMapper workspaceMapper;
     private final NotificationMapper notificationMapper;
+    private final WorkspaceMemberMapper workspaceMemberMapper;
 
+    private final HexColorGenerator colorGenerator;
 
     @Transactional
     @Override
@@ -59,10 +63,16 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new AlreadyExistException("Ya tienes un workspace con ese nombre");
         }
 
+        String color = workspaceInput.getColor();
+        if (color == null || color.isEmpty()) {
+            color = colorGenerator.generateRandomHexColor();
+        }
+
         // Crear Workspace
         Workspace workspace = Workspace.builder()
                 .name(workspaceInput.getName())
                 .owner(owner)
+                .color(color)
                 .build();
 
         // Crear wspacemember
@@ -78,21 +88,60 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         //y su relacion con esta tabla
         workspace.getMembers().add(member);
 
-        //Opcional crear proyecto
-        //Si se crear asocialro al wspace
 
 
+        //Buscar los ids de los usuarios y añadirlos
+        List<User> allUsers = userRepository.findAllById(workspaceInput.getMembers_id());
 
-        // porque se crea vacio y adentro se añade el proyecto
-        // Que dicha accion se ejecuta es en el servicio del proyect
+        if(allUsers.size() != workspaceInput.getMembers_id().size()){
+            throw new ItemNotFoundException("Uno o más usuarios no encontrados");
+        }
+
+        allUsers.forEach((p) -> {
+            WorkspaceMember memberItem = WorkspaceMember.builder()
+                    .user(p)
+                    .role(Role.MEMBER)
+                    .workspace(workspace)
+                    .build();
+
+            workspace.getMembers().add(memberItem);
+
+        });
         workspaceRepository.save(workspace);
 
-        return  workspaceMapper.toResponseWithoutCount(workspace);
+
+        Long memberCount = (long) workspace.getMembers().size();
+        Long projectCount = 0L;
+
+        workspace.getMembers().stream()
+                .filter(m -> !m.getUser().getId().equals(owner_id)) // solo miembros, no owner
+                .forEach(m -> {
+                    Notification notification = Notification.builder()
+                            .user(m.getUser())
+                            .title("Nuevo en espacio de trabajo")
+                            .message("Has sido añadido a un espacio de trabajo")
+                            .type(NotificationType.COMMENT)
+                            .build();
+
+                    notificationRepository.save(notification);
+
+                    NotificationResponse notifResp = notificationMapper.toResponse(notification);
+
+                    WorkspaceMemberResponse wmResponse =
+                            workspaceMemberMapper.toResponseCount(m, memberCount, projectCount);
+
+                    notifResp.setWorkspaceMember(wmResponse);
+                    notificationPublisher.publish(m.getUser().getId().toString(), notifResp);
+                });
+
+
+        return  workspaceMapper.toResponse(workspace,memberCount,projectCount);
     }
 
     @Transactional(readOnly = true)
     @Override
     public List<WorkspaceResponse> findAll() {
+
 
 
                 return workspaceRepository.findAll()

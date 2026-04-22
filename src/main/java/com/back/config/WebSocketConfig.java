@@ -23,7 +23,7 @@ public class WebSocketConfig implements WebGraphQlInterceptor {
     @Override
     public Mono<WebGraphQlResponse> intercept(WebGraphQlRequest request, Chain chain) {
 
-        System.out.println("📩 HEADERS: " + request.getHeaders());
+        System.out.println("WSOCK HEADERS: " + request.getHeaders());
 
         // =========================
         // 1. EXTRAER TOKEN
@@ -51,7 +51,7 @@ public class WebSocketConfig implements WebGraphQlInterceptor {
             }
         }
 
-        System.out.println("🔐 TOKEN: " + token);
+        System.out.println("WSOCK TOKEN: " + token);
 
         // 2. VALIDAR TOKEN
         if (token != null && authenticationService.isAccessToken(token)) {
@@ -65,7 +65,7 @@ public class WebSocketConfig implements WebGraphQlInterceptor {
                             userDetails.getAuthorities()
                     );
 
-            System.out.println("✅ USER AUTHENTICATED: " + userDetails.getUsername());
+            System.out.println("WSOCKET USER AUTHENTICATED: " + userDetails.getUsername());
 
 
             // 3. INYECTAR CONTEXTO GRAPHQL + SECURITY
@@ -89,7 +89,7 @@ public class WebSocketConfig implements WebGraphQlInterceptor {
         }
 
 
-        System.out.println("❌ NO AUTH TOKEN FOUND");
+        System.out.println("WSOCKET NO AUTH TOKEN FOUND");
 
         return chain.next(request);
     }

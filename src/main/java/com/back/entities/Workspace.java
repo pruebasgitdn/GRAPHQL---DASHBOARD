@@ -27,6 +27,9 @@ public class Workspace {
     @Column(nullable = false)
     private String name;
 
+
+    private String color;
+
     //El logueado
     // R 1:1
     @ManyToOne(fetch = FetchType.LAZY)

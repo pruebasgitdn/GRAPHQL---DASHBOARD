@@ -34,8 +34,6 @@ public class NotificationSubscriptionController {
     ){
 
 
-//        UserDetailsImpl user = context.get("user");
-
         UserDetailsImpl auth =  (UserDetailsImpl) context.get("user");
 
         System.out.println("user: " + auth.getId());
@@ -43,13 +41,13 @@ public class NotificationSubscriptionController {
 
         return publisherService.subscribe(auth.getId().toString())
                 .doOnSubscribe(sub ->
-                        System.out.println("📡 SUSCRITO: " + auth.getId().toString())
+                        System.out.println("SUSCRITO: " + auth.getId().toString())
                 )
                 .doOnNext(n ->
-                        System.out.println("🔔 NOTIFICACIÓN: " + n)
+                        System.out.println(" NOTIFICACIÓN: " + n)
                 )
                 .doOnCancel(() ->
-                        System.out.println("❌ DESUSCRITO: " + auth.getId().toString())
+                        System.out.println(" DESUSCRITO: " + auth.getId().toString())
                 );
     }
 

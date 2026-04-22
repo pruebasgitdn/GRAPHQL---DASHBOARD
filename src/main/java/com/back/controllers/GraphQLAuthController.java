@@ -5,6 +5,7 @@ import com.back.entities.dto.LoginInput;
 import com.back.security.UserDetailsImpl;
 import com.back.services.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -27,7 +28,8 @@ public class GraphQLAuthController {
 
 
     @MutationMapping(name = "login")
-    public AuthResponse login(@Valid @Argument LoginInput login) {
+    public AuthResponse login(@Valid @Argument LoginInput login
+                              ) {
         return authenticationService.authenticate(
                 login.getEmail(),
                 login.getPassword()

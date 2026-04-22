@@ -28,6 +28,7 @@ type Workspace {
     id: ID!
     name: String!
     owner: User!
+    color: String
 
 }
 
@@ -70,6 +71,8 @@ type WorkspaceMember {
 
 input CreateWorkspaceInput {
     name: String!
+    members_id: [ID]
+    color: String
 }
 
 
@@ -95,19 +98,17 @@ type WorkspaceResponse {
     id: ID!
     name: String!
     owner: User!
+    createdAt: String
+    updatedAt: String
     memberCount: Int
     projectCount: Int
+    color: String
 }
 
-type WorkspaceSimpleResponse {
-    id: ID!
-    name: String!
-    owner: User!
 
-}
 
 type WorkspaceMemberResponse {
-    id: Int!
+    id: Int
     user: User
     workspace:WorkspaceResponse
     role: Role
@@ -118,7 +119,10 @@ type WorkSpaceDetailResponse {
     name: String!
     owner: User!
     memberCount: Int
+    createdAt: String
+    updatedAt: String
     projects: [ProjectSimpleResponse]
+    color: String
 }
 
 type ProjectSimpleResponse{
@@ -151,11 +155,12 @@ input CreateProjectInput {
 }
 
 type NotificationResponse {
-    id: Int!
+    id: Int
     title: String
     message: String
     user: User
     type: NotificationType
+    workspaceMember: WorkspaceMemberResponse
 
 }
 

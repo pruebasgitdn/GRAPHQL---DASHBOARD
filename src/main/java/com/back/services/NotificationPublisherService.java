@@ -2,6 +2,7 @@ package com.back.services;
 import com.back.entities.Notification;
 import com.back.entities.User;
 import com.back.entities.dto.NotificationResponse;
+import com.back.entities.dto.WorkspaceMemberResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import lombok.NoArgsConstructor;
@@ -86,6 +87,19 @@ public class NotificationPublisherService {
             sink.tryEmitNext(notification);
         }
     }
+
+//    public void publishAddedToWorkspace(String userId, NotificationResponse notification
+//            , WorkspaceMemberResponse workspaceMemberResponse) {
+//
+//        Sinks.Many<NotificationResponse> sink = userSinks.get(userId);
+//        // obtener el sink que corresponde al userId del userSinks anterior
+//        // donde se subscribe
+//
+//        //Si no esta vacio emitir ,intenar emitir
+//        if (sink != null) {
+//            sink.tryEmitNext(workspaceMemberResponse);
+//        }
+//    }
 
 
     public List<String> getActiveUsers() {
