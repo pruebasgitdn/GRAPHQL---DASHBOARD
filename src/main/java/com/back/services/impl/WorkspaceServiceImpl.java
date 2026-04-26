@@ -14,10 +14,7 @@ import com.back.exceptions.AlreadyExistException;
 import com.back.exceptions.ItemNotFoundException;
 import com.back.exceptions.UserNotFoundException;
 import com.back.repositories.*;
-import com.back.services.HexColorGenerator;
-import com.back.services.NotificationPublisherService;
-import com.back.services.WorkspaceMemberService;
-import com.back.services.WorkspaceService;
+import com.back.services.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -49,6 +46,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     private final WorkspaceMemberMapper workspaceMemberMapper;
 
     private final HexColorGenerator colorGenerator;
+
+    private final UserService userService;
 
     @Transactional
     @Override
@@ -164,10 +163,10 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         Workspace workspace = workspaceRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Espacio de trabajo no encontrado por el id: " + id));
 
-        long memberCount = workspaceMemberRepository.countByWorkspaceId(workspace.getId());
-        //long projectCount = projectRepository.countByWorkspaceId(workspace.getId());
-
-        return  workspaceMapper.toDetailResponse(workspace,memberCount);
+        List<MemberRoleResponse> memberRoles = workspaceMemberService.getMembersFromWorkspace(workspace.getId());
+        System.out.print(memberRoles);
+        long memberCount = memberRoles.size();
+        return  workspaceMapper.toDetailResponse(workspace,memberCount,memberRoles);
     }
 
 

@@ -2,6 +2,7 @@ package com.back.controllers;
 import com.back.entities.User;
 import com.back.entities.Workspace;
 import com.back.entities.WorkspaceMember;
+import com.back.entities.dto.MemberRoleResponse;
 import com.back.entities.dto.WorkspaceMemberResponse;
 import com.back.entities.dto.WorkspaceMembersResponse;
 import com.back.entities.dto.WorkspaceResponse;
@@ -63,6 +64,18 @@ public class GraphQLWorkspaceMembersController {
         return  workspaceMemberService.getUserWorkspaces(memberId);
     }
 
+    @QueryMapping(name = "getMembersFromWorkspace")
+    public List<MemberRoleResponse> getMembersFromWorkspace(@Argument(name = "workspaceId") UUID workspaceId){
+        return  workspaceMemberService.getMembersFromWorkspace(workspaceId);
+    }
+
+
+    @QueryMapping(name = "isMember")
+    public Boolean isMember(@Argument(name = "workspaceId") UUID workspaceId,
+                            @Argument(name = "userId") UUID userId
+                            ){
+        return  workspaceMemberService.isMember(workspaceId,userId);
+    }
 
 
 //    @SchemaMapping(typeName = "WorkspaceMembersResponse", field = "users","workspace")

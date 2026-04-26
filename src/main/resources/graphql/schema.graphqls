@@ -119,6 +119,8 @@ type WorkSpaceDetailResponse {
     name: String!
     owner: User!
     memberCount: Int
+    projectCount: Int
+    members: [MemberRoleResponse]
     createdAt: String
     updatedAt: String
     projects: [ProjectSimpleResponse]
@@ -188,8 +190,19 @@ input EditProjectInput {
     taskIds: [ID!]
 }
 
+type MemberRoleResponse {
+    user: User
+    role: Role
+}
+
 type Query {
     userList: [User]
+
+    usersById(userIds: [ID]!):[User]
+
+    getMembersFromWorkspace(workspaceId: ID!): [MemberRoleResponse]
+
+    isMember(workspaceId: ID!, userId: ID!): Boolean
 
     workspaceList: [WorkspaceResponse]
 

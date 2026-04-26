@@ -78,4 +78,13 @@ public class UserServiceImpl implements UserService {
 
         return userMapper.mapUsers(allU);
     }
+
+    @Override
+    public List<UserResponse> findAllById(List<UUID> usersId) {
+
+       List<User> users  = userRepository.findAllById(usersId);
+        return users.stream()
+                .map(userMapper::toResponse)
+                .toList();
+    }
 }

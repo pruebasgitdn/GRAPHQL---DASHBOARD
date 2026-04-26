@@ -20,11 +20,13 @@ public class WorkSpaceDetailResponse {
     private String name;
     private UserResponse owner;
     private Long memberCount;
+    private List<MemberRoleResponse> members;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     private List<ProjectSimpleResponse> projects;
+    private Long projectCount;
 
     private String color;
 

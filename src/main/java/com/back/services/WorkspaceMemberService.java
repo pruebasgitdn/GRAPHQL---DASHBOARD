@@ -1,5 +1,6 @@
 package com.back.services;
 
+import com.back.entities.dto.MemberRoleResponse;
 import com.back.entities.dto.WorkspaceMemberResponse;
 
 import java.util.List;
@@ -17,5 +18,6 @@ public interface WorkspaceMemberService {
 
     boolean isMember(UUID workspaceId, UUID userId);
 
+    List<MemberRoleResponse> getMembersFromWorkspace(UUID workspace_id);
 
 }

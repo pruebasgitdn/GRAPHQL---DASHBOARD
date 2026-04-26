@@ -16,5 +16,6 @@ public interface UserService {
 
     List<UserResponse> findAll();
 
+    List<UserResponse> findAllById(List<UUID> usersId);
 
 }

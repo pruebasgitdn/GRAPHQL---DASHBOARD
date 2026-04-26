@@ -56,7 +56,9 @@ public class WorkspaceMapper {
                 .build();
     }
 
-    public WorkSpaceDetailResponse toDetailResponse(Workspace workspace, Long memberCount) {
+    public WorkSpaceDetailResponse toDetailResponse(Workspace workspace,
+                                                    Long memberCount,
+                                                    List<MemberRoleResponse> memberRoles) {
 
         List<ProjectSimpleResponse> projects = workspace.getProjects().stream()
                 .map(p -> ProjectSimpleResponse.builder()
@@ -72,9 +74,10 @@ public class WorkspaceMapper {
                 .name(workspace.getName())
                 .owner(userMapper.toResponse(workspace.getOwner()))
                 .memberCount(memberCount)
-                .createdAt(workspace.getCreatedAt())
+                .projectCount((long) projects.size())                .createdAt(workspace.getCreatedAt())
                 .updatedAt(workspace.getUpdatedAt())
                 .projects(projects)
+                .members(memberRoles)
                 .color(workspace.getColor())
                 .build();
     }

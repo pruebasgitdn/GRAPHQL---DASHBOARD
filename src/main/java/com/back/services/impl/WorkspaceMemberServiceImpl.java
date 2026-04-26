@@ -1,6 +1,7 @@
 package com.back.services.impl;
 
 import com.back.entities.WorkspaceMember;
+import com.back.entities.dto.MemberRoleResponse;
 import com.back.entities.dto.WorkspaceMemberResponse;
 import com.back.entities.dto.WorkspaceMembersResponse;
 import com.back.entities.mappers.WorkspaceMemberMapper;
@@ -94,5 +95,16 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
     @Override
     public boolean isMember(UUID workspaceId, UUID userId) {
         return workspaceMemberRepository.existsByWorkspace_IdAndUser_Id(workspaceId,userId);
+    }
+
+    @Override
+    public List<MemberRoleResponse> getMembersFromWorkspace(UUID workspace_id) {
+
+        List<WorkspaceMember> wmembers= workspaceMemberRepository.findAllByWorkspaceId(workspace_id);
+
+
+        return wmembers.stream()
+                .map(workspaceMemberMapper::toMemberRole)
+                .toList();
     }
 }

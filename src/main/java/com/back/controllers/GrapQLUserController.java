@@ -40,6 +40,10 @@ public class GrapQLUserController {
         return userService.findById(id);
     }
 
+    @QueryMapping(name = "usersById")
+    public List<UserResponse> usersById(@Argument(name =  "userIds") List<UUID> userIds){
+        return userService.findAllById(userIds);
+    }
 
 
 
