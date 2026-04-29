@@ -24,6 +24,9 @@ public class UserInput {
     @Size(min = 5,max = 10,message = "La contraseña debe tener minimo 3 y máximo 10 caracteres" )
     private String password;
 
+    @NotNull(message = "Contraseña de confirmacion vacia")
+    private String repeatPassword;
+
     private String profilePic;
 
 

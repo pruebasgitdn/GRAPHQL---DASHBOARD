@@ -29,7 +29,4 @@ public class WorkspaceResponse {
 
     private String color;
 
-
-
-
 }

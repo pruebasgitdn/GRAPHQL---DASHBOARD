@@ -4,7 +4,9 @@ import com.back.enums.TaskStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +25,21 @@ public class Task {
     @Column(nullable = false)
     private String title;
 
+    @Column(nullable = true)
     private String description;
+
+    @Column(nullable = true)
+    private LocalDateTime completedAt;
+
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean isArchived = false;
+
+    @Column(nullable = true)
+    private Double actualHours;
+
+    @Column(nullable = false)
+    private Double estimatedHours;
 
     //R FK => 1:1
     @ManyToOne(fetch = FetchType.LAZY)

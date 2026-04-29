@@ -2,11 +2,9 @@ package com.back.services.impl;
 
 import com.back.entities.Project;
 import com.back.entities.Task;
+import com.back.entities.User;
 import com.back.entities.Workspace;
-import com.back.entities.dto.CreateProjectInput;
-import com.back.entities.dto.EditProjectInput;
-import com.back.entities.dto.ProjectResponse;
-import com.back.entities.dto.WorkSpaceDetailResponse;
+import com.back.entities.dto.*;
 import com.back.entities.mappers.ProjectMapper;
 import com.back.entities.mappers.TasksMapper;
 import com.back.entities.mappers.UserMapper;
@@ -15,8 +13,10 @@ import com.back.exceptions.AlreadyExistException;
 import com.back.exceptions.ItemNotFoundException;
 import com.back.repositories.ProjectRepository;
 import com.back.repositories.TasksRepository;
+import com.back.repositories.UserRepository;
 import com.back.repositories.WorkspaceRepository;
 import com.back.services.ProjectService;
+import com.back.services.UserService;
 import com.back.services.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
     private final WorkspaceRepository workspaceRepository;
-    private final WorkspaceService workspaceService;
+    private final UserRepository userRepository;
+
     private final TasksRepository tasksRepository;
 
     private final TasksMapper tasksMapper;
@@ -48,6 +49,13 @@ public class ProjectServiceImpl implements ProjectService {
             throw new ItemNotFoundException("Worksapce no encontrado");
         });
 
+        //Encontrar owner
+
+        User owner = userRepository.findById(projectInput.getOwnerId()).orElseThrow(()->{
+            throw new ItemNotFoundException("Creador no encontrado");
+        });
+
+
 
         String name = projectInput.getName().trim(); //Normalizar
         //Validar
@@ -62,6 +70,10 @@ public class ProjectServiceImpl implements ProjectService {
            tasksListToAdd = tasksRepository.findAllById(projectInput.getTaskIds());
         }
 
+        if(projectInput.getDueDate().isBefore(projectInput.getStartDate())){
+            throw new RuntimeException("Ingresa un rango de fechas valido");
+        }
+
 
         //Crear pryecto,guardar y retornar
         Project project = Project
@@ -69,6 +81,10 @@ public class ProjectServiceImpl implements ProjectService {
                 .name(projectInput.getName())
                 .description(projectInput.getDescription())
                 .workspace(workspace)
+                .owner(owner)
+                .status(projectInput.getStatus())
+                .startDate(projectInput.getStartDate())
+                .dueDate(projectInput.getDueDate())
                 .tasks(tasksListToAdd)
                 .build();
 

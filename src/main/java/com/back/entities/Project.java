@@ -1,8 +1,11 @@
 package com.back.entities;
+import com.back.enums.ProjectStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -23,8 +26,29 @@ public class Project {
     @Column(nullable = false)
     private String name;
 
+//    @Column(nullable = false)
+//    private Integer progress = 0;
+
+    @Column(nullable = false)
+    private LocalDate startDate;
+
+    @Column(nullable = false)
+    private LocalDate dueDate;
+
+    @Column(nullable = false)
+    private ProjectStatus status;
+
+    @Builder.Default
+    @Column(nullable = true)
+    private Boolean isArchived = false;
+
+
+
     private String description;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workspace_id", nullable = false)

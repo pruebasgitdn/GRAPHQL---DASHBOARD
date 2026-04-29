@@ -60,10 +60,6 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
 
         List<WorkspaceMember> workspaceMembers =  workspaceMemberRepository.findAllByUserId(user_id);
 
-        //contar miemrbso y projects para pasarlos
-//        return workspaceMembers.stream()
-//                .map(workspaceMemberMapper::toResponse)
-//                .collect(Collectors.toList());
 
         return workspaceMembers.stream()
                 .map(wm -> {

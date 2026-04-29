@@ -5,8 +5,17 @@ type User {
     profilePic: String
 }
 
+scalar Date
+scalar DateTime
+scalar LocalTime
+
 enum Role {
     OWNER,ADMIN,MEMBER,GUEST
+}
+
+enum ProjectStatus{
+    PLANNING,IN_PROGRESS,ON_HOLD,COMPLETED,CANCELLED
+
 }
 
 enum NotificationType{
@@ -146,13 +155,18 @@ input UserInput {
     name: String!
     email: String!
     password: String!
+    repeatPassword:String!
     profilePic: String
 }
 
 input CreateProjectInput {
     name: String!
     description: String
+    startDate: Date!
+    dueDate: Date!
+    status: ProjectStatus
     workspaceId: ID!
+    ownerId: ID!
     taskIds: [ID]
 }
 

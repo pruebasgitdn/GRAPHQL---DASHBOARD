@@ -141,8 +141,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public List<WorkspaceResponse> findAll() {
 
-
-
                 return workspaceRepository.findAll()
                 .stream()
                 .map(p ->{
@@ -151,8 +149,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                     return workspaceMapper.toResponse(p,memberCount,projectCount);
                 })
                 .toList();
-
-
     }
 
 

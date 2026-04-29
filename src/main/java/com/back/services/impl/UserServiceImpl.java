@@ -38,6 +38,9 @@ public class UserServiceImpl implements UserService {
              throw new RuntimeException("El email: "+userExist.get().getEmail()+" ya esta en uso.");
          }
 
+         if(!user.getPassword().equals(user.getRepeatPassword())){
+             throw new RuntimeException("Las contraseñas no coinciden");
+         }
 
          //Mapper, codificar contraseña y retornar lo guardado
          User userToSave = userMapper.toEntity(user);

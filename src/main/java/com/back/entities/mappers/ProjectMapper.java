@@ -17,6 +17,7 @@ import java.util.List;
 public class ProjectMapper {
 
     private final WorkspaceMapper workspaceMapper;
+    private final UserMapper userMapper;
     private final TasksRepository tasksRepository;
 
     public ProjectResponse toResponseWithTasksCount(Project project, Long taskCount) {
@@ -24,6 +25,10 @@ public class ProjectMapper {
                 .id(project.getId())
                 .name(project.getName())
                 .description(project.getDescription())
+                .owner(userMapper.toResponse(project.getOwner()))
+                .status(project.getStatus())
+                .dueDate(project.getDueDate())
+                .startDate(project.getStartDate())
                 .workspace(workspaceMapper.toResponseWithoutCount(project.getWorkspace()))
                 .tasksCount(taskCount)
                 .build();
@@ -34,6 +39,10 @@ public class ProjectMapper {
                 .id(project.getId())
                 .name(project.getName())
                 .description(project.getDescription())
+                .owner(userMapper.FromResponseToEntity(project.getOwner()))
+                .status(project.getStatus())
+                .dueDate(project.getDueDate())
+                .startDate(project.getStartDate())
                 .workspace(workspaceMapper.toEntityWithoutCount(project.getWorkspace()))
                 .build();
     }
@@ -43,6 +52,10 @@ public class ProjectMapper {
                 .id(project.getId())
                 .name(project.getName())
                 .description(project.getDescription())
+                .owner(userMapper.toResponse(project.getOwner()))
+                .status(project.getStatus())
+                .dueDate(project.getDueDate())
+                .startDate(project.getStartDate())
                 .workspace(workspaceMapper.toResponseWithoutCount(project.getWorkspace()))
                 .build();
     }
