@@ -71,7 +71,7 @@ public class GraphQLWorkspaceController {
     }
 
 
-    @SchemaMapping(typeName = "WorkspaceResponse", field = "owner")
+        @SchemaMapping(typeName = "WorkspaceResponse", field = "owner")
     public User resolveOwner(WorkspaceResponse workspace) {
         return userRepository.findById(workspace.getOwnerId())
                 .orElseThrow(() -> new RuntimeException("Owner no encontrado"));
