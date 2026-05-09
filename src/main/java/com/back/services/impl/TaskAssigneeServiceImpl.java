@@ -103,8 +103,6 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
 
         taskAssigneeRepository.save(taskAssignee);
 
-
-
         //Emitir notificacion
         NotificationResponse notification = NotificationResponse.builder()
                 .user(user)

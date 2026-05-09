@@ -8,15 +8,19 @@ type User {
 scalar Date
 scalar DateTime
 scalar LocalTime
+scalar LocalDateTime
+scalar LocalDate
+
+
+enum TaskLabelType {
+    BUG, FEATURE, UI, DOC, TEST
+
+}
 
 enum Role {
     OWNER,ADMIN,MEMBER,GUEST
 }
 
-enum ProjectStatus{
-    PLANNING,IN_PROGRESS,ON_HOLD,COMPLETED,CANCELLED
-
-}
 
 enum NotificationType{
     ASSIGN,COMMENT,STATUS_CHANGE,MENTION
@@ -48,22 +52,43 @@ type TaskResponse {
     project: ProjectResponse
     status: TaskStatus
     priority: TaskPriority
+    estimatedHours: Float
+    completedAt: LocalDateTime
+    createdAt: LocalDateTime
+    isArchived: Boolean
+    owner:User
+    actualHours:Float
+    dueDate: LocalDate
+    labels:[TaskLabelType]
+    subTasks:[SubTaskResponse]
+
 }
 
+input CreateSubTask{
+    title: String!
+    completed: Boolean
+}
 
+type SubTaskResponse {
+    id: Int
+    title: String
+    completed:Boolean
+    createdAt: LocalDateTime
+}
 
 
 type ProjectResponse {
 
     id: Int!
-
     name: String!
-
-    description:String
-
     workspace: WorkspaceResponse!
-
+    description:String
     tasksCount: Int
+    startDate: LocalDate!
+    dueDate:LocalDate!
+    status:ProjectStatus!
+    owner:User!
+    isArchived:Boolean
 
 }
 
@@ -136,11 +161,19 @@ type WorkSpaceDetailResponse {
     color: String
 }
 
+enum ProjectStatus {
+    PLANNING,IN_PROGRESS,ON_HOLD,COMPLETED,CANCELLED
+
+}
+
 type ProjectSimpleResponse{
     id: Int
     name:String
     description:String
     tasksCount:Int
+    createdAt: LocalDateTime
+    startDate: LocalDate
+    status: ProjectStatus
 }
 
 
@@ -161,12 +194,12 @@ input UserInput {
 
 input CreateProjectInput {
     name: String!
-    description: String
-    startDate: Date!
-    dueDate: Date!
-    status: ProjectStatus
+    startDate: LocalDate!
+    dueDate: LocalDate!
+    status: ProjectStatus!
     workspaceId: ID!
     ownerId: ID!
+    description: String
     taskIds: [ID]
 }
 
@@ -185,8 +218,13 @@ input CreateTaskInput {
     projectId: ID!
     status: TaskStatus!
     priority: TaskPriority!
+    estimatedHours: Float!
+    dueDate: LocalDate!
     description: String
-
+    completedAt: LocalDateTime
+    isArchived: Boolean
+    actualHours: Float
+    labels:[TaskLabelType]
 
 }
 
@@ -286,6 +324,9 @@ type Mutation {
     deleteProject(projectId: Int!): Boolean
 
     createAssignation(taskAssigneeInput: CreateTaskAssigneeInput):TaskAssigneeResponse
+
+    createSubTasks(inputs: [CreateSubTask]!,taskId: Int!):[SubTaskResponse]
+
 
 }
 

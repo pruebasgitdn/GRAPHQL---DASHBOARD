@@ -2,14 +2,17 @@ package com.back.controllers;
 
 
 import com.back.entities.Task;
+import com.back.entities.User;
 import com.back.entities.dto.*;
 import com.back.entities.mappers.TasksMapper;
 import com.back.security.UserDetailsImpl;
+import com.back.services.SubTaskService;
 import com.back.services.TasksService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +25,7 @@ import java.util.List;
 public class GraphQLTasksController {
 
     private final TasksService tasksService;
-    private final TasksMapper tasksMapper;
+    private final SubTaskService subTaskService;
 
 
     //  Crear task
@@ -36,7 +39,7 @@ public class GraphQLTasksController {
             throw new AuthenticationCredentialsNotFoundException("No se econtraron las credenciales de autenticacion");
         }
 
-        return tasksService.createTask(createTaskInput);
+        return tasksService.createTask(createTaskInput,authenticated.getId());
     }
 
     // Tareas
@@ -86,6 +89,13 @@ public class GraphQLTasksController {
         }
 
         return tasksService.editTask(taskId,editTaskInput);
+    }
+
+    @SchemaMapping(typeName = "TaskResponse", field = "subTasks")
+    public List<SubTaskResponse> resolveSubTasks(TaskResponse taskResponse) {
+
+        return subTaskService.getSubTasksByTaskId(taskResponse.getId());
+
     }
 
 

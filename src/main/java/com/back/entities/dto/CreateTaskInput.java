@@ -1,5 +1,7 @@
 package com.back.entities.dto;
 
+import com.back.entities.TaskLabel;
+import com.back.enums.TaskLabelType;
 import com.back.enums.TaskPriority;
 import com.back.enums.TaskStatus;
 import jakarta.persistence.Column;
@@ -9,6 +11,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -21,12 +26,27 @@ public class CreateTaskInput {
     @NotNull(message = "La tarea debe ir asociado a un proyecto")
     private long projectId;
 
+    @NotNull(message = "Ingresa fecha de entrega")
+    private LocalDate dueDate;
+
     private String description;
 
     private TaskStatus status;
 
     private TaskPriority priority;
 
+    private LocalDateTime completedAt;
+
+    private Boolean isArchived;
+
+    @NotNull(message = "Ingresa el tiempo estimado para llevar a cabo la tarea")
+    private Double estimatedHours;
+
+    private Double actualHours;
+
+    private List<TaskLabelType> labels;
+
+    //private List<CreateSubTask> subTasks;
 
 
 }

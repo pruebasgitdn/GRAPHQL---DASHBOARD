@@ -5,6 +5,7 @@ import com.back.entities.mappers.TasksMapper;
 import com.back.entities.mappers.WorkspaceMapper;
 import com.back.security.UserDetailsImpl;
 import com.back.services.ProjectService;
+import com.back.services.WorkspaceMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -25,8 +26,6 @@ import java.util.UUID;
 public class GraphQLProjectController {
 
     private final ProjectService projectService;
-    private final WorkspaceMapper workspaceMapper;
-    private final TasksMapper tasksMapper;
 
     @PreAuthorize("isAuthenticated()")
     @MutationMapping(name = "createProject")

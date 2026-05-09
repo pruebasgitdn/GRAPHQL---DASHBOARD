@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProjectResponse {
+public class  ProjectResponse {
 
     private Long id;
     private String name;
@@ -30,5 +30,7 @@ public class ProjectResponse {
     private ProjectStatus status;
     private UserResponse owner;
     private Boolean isArchived;
+
+    private List<TaskResponse> tasks;
 
 }

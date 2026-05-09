@@ -66,6 +66,9 @@ public class WorkspaceMapper {
                         .name(p.getName())
                         .description(p.getDescription())
                         .tasksCount((long) p.getTasks().size())
+                        .createdAt(p.getCreatedAt())
+                        .startDate(p.getStartDate())
+                        .status(p.getStatus())
                         .build())
                 .toList();
 

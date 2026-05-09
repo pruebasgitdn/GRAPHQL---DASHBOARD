@@ -46,6 +46,8 @@ public class CreateProjectInput {
 
     private List<Long> taskIds;
 
+    private Boolean isArchived;
+
 
 
 }

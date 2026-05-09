@@ -46,6 +46,12 @@ public class Task {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
+    //El logueado
+    // R 1:1
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TaskStatus status;
@@ -53,6 +59,14 @@ public class Task {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TaskPriority priority;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<SubTask> subtasks = new ArrayList<>();
+
+    @Column(nullable = false)
+    private LocalDate dueDate;
+
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

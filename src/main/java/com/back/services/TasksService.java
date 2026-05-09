@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface TasksService {
 
-    TaskResponse createTask(CreateTaskInput createTaskInput);
+    TaskResponse createTask(CreateTaskInput createTaskInput,UUID creator);
 
     List<TaskResponse> findAllTasks();
 

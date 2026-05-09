@@ -14,5 +14,7 @@ public class GraphQLConfig {
                 .scalar(ExtendedScalars.LocalTime)
                 .scalar(ExtendedScalars.DateTime);
 
+
+
     }
 }

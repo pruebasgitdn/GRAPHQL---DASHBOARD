@@ -3,6 +3,8 @@ package com.back.repositories;
 import com.back.entities.Project;
 import com.back.entities.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,6 +24,15 @@ public interface TasksRepository extends JpaRepository<Task,Long> {
     List<Task> findAllByProjectId(Long projectId);
 
     Long countByProjectId(Long projectId);
+
+
+    @Query("""
+    SELECT t FROM Task t
+    LEFT JOIN FETCH t.labels
+    WHERE t.id = :id
+    """)
+    Optional<Task> findByIdWithLabels(Long id);
+
 
     void deleteByProjectId(Long projectId);
 }

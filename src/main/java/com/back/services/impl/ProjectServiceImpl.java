@@ -10,6 +10,7 @@ import com.back.entities.mappers.TasksMapper;
 import com.back.entities.mappers.UserMapper;
 import com.back.entities.mappers.WorkspaceMapper;
 import com.back.exceptions.AlreadyExistException;
+import com.back.exceptions.InvalidCredentialsException;
 import com.back.exceptions.ItemNotFoundException;
 import com.back.repositories.ProjectRepository;
 import com.back.repositories.TasksRepository;
@@ -17,6 +18,7 @@ import com.back.repositories.UserRepository;
 import com.back.repositories.WorkspaceRepository;
 import com.back.services.ProjectService;
 import com.back.services.UserService;
+import com.back.services.WorkspaceMemberService;
 import com.back.services.WorkspaceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,10 +36,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final TasksRepository tasksRepository;
 
-    private final TasksMapper tasksMapper;
-    private final WorkspaceMapper workspaceMapper;
-    private final UserMapper userMapper;
     private final ProjectMapper projectMapper;
+    private final WorkspaceMemberService workspaceMemberService;
 
 
 
@@ -50,11 +50,13 @@ public class ProjectServiceImpl implements ProjectService {
         });
 
         //Encontrar owner
-
         User owner = userRepository.findById(projectInput.getOwnerId()).orElseThrow(()->{
             throw new ItemNotFoundException("Creador no encontrado");
         });
 
+        if(!workspaceMemberService.isMember(workspace.getId(),owner.getId())){
+            throw  new RuntimeException("No eres miembro, no tienes permiso para esta accion (crear proyecto)");
+        }
 
 
         String name = projectInput.getName().trim(); //Normalizar
@@ -86,6 +88,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .startDate(projectInput.getStartDate())
                 .dueDate(projectInput.getDueDate())
                 .tasks(tasksListToAdd)
+                .isArchived(false)
                 .build();
 
          projectRepository.save(project);

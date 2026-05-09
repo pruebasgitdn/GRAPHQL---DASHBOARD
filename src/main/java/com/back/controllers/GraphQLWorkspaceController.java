@@ -6,6 +6,7 @@ import com.back.entities.dto.WorkSpaceDetailResponse;
 import com.back.entities.dto.WorkspaceResponse;
 import com.back.repositories.UserRepository;
 import com.back.security.UserDetailsImpl;
+import com.back.services.WorkspaceMemberService;
 import com.back.services.WorkspaceService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -31,6 +32,8 @@ public class GraphQLWorkspaceController {
     private final WorkspaceService workspaceService;
     private final UserRepository userRepository;
 
+
+
     @PreAuthorize("isAuthenticated()")
     @MutationMapping(name = "createWorkspace")
     public WorkspaceResponse createWorkspace(@Valid @Argument CreateWorkspaceInput workspaceInput,
@@ -38,7 +41,6 @@ public class GraphQLWorkspaceController {
 
         UUID user_id = user.getId();
 
-        System.out.println(user_id);
 
         return workspaceService.createWorkspace(workspaceInput,user_id);
     }

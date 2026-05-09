@@ -37,6 +37,14 @@
 			<version>1.6.3</version>
 		</dependency>
 
+
+		<!-- WebFlux (necesario para subscriptions reactivas) -->
+		<dependency>
+			<groupId>com.tailrocks.graphql</groupId>
+			<artifactId>graphql-datetime-spring-boot-starter</artifactId>
+			<version>6.0.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>

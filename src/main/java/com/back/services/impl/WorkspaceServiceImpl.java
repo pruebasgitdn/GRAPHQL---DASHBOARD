@@ -47,7 +47,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     private final HexColorGenerator colorGenerator;
 
-    private final UserService userService;
 
     @Transactional
     @Override

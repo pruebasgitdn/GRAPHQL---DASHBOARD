@@ -26,23 +26,19 @@ public class Project {
     @Column(nullable = false)
     private String name;
 
-//    @Column(nullable = false)
-//    private Integer progress = 0;
-
     @Column(nullable = false)
     private LocalDate startDate;
 
     @Column(nullable = false)
     private LocalDate dueDate;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
     private ProjectStatus status;
 
+    @Column(nullable = false)
     @Builder.Default
-    @Column(nullable = true)
     private Boolean isArchived = false;
-
-
 
     private String description;
 
@@ -64,6 +60,8 @@ public class Project {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -72,8 +70,5 @@ public class Project {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
-
-
-
 
 }

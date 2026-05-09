@@ -14,6 +14,8 @@ import com.back.exceptions.UserNotFoundException;
 import com.back.repositories.ProjectRepository;
 import com.back.repositories.TaskAssigneeRepository;
 import com.back.repositories.TasksRepository;
+import com.back.repositories.UserRepository;
+import com.back.services.TaskLabelService;
 import com.back.services.TasksService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,22 +33,30 @@ public class TasksServiceImpl implements TasksService {
     private final TasksRepository tasksRepository;
     private final ProjectRepository projectRepository;
     private final TaskAssigneeRepository taskAssigneeRepository;
+    private final UserRepository userRepository;
 
     private final TasksMapper tasksMapper;
     private final ProjectMapper projectMapper;
+    private final TaskLabelService taskLabelService;
 
 
+    @Transactional(readOnly = false)
     @Override
-    public TaskResponse createTask(CreateTaskInput createTaskInput) {
+    public TaskResponse createTask(CreateTaskInput createTaskInput,UUID owner_id) {
+
+        //encontrar proyecto
+        Project project = projectRepository.findById(createTaskInput.getProjectId())
+                .orElseThrow(()-> {throw new ItemNotFoundException("No se encontro dicho proyecto");});
 
         //verificar
         if(tasksRepository.existsByTitleAndProjectId(createTaskInput.getTitle(),createTaskInput.getProjectId())){
             throw new AlreadyExistException("Ya existe una tarea con ese nombre en este proyecto");
         }
 
-        //encontrar proyecto
-        Project project = projectRepository.findById(createTaskInput.getProjectId())
-                .orElseThrow(()-> {throw new ItemNotFoundException("No se encontro dicho proyecto");});
+        //Ww
+        User owner = userRepository.findById(owner_id).orElseThrow(()->{
+            throw new ItemNotFoundException("Creador no encontrado");
+        });
 
 
         Task taskToSave = Task.builder()
@@ -55,12 +65,27 @@ public class TasksServiceImpl implements TasksService {
                 .project(project)
                 .priority(createTaskInput.getPriority())
                 .status(createTaskInput.getStatus())
+                .actualHours(createTaskInput.getActualHours())
+                .completedAt(createTaskInput.getCompletedAt())
+                .estimatedHours(createTaskInput.getEstimatedHours())
+                .isArchived(false)
+                .dueDate(createTaskInput.getDueDate())
+                .owner(owner)
                 .build();
 
-        tasksRepository.save(taskToSave);
+        Task savedTask = tasksRepository.save(taskToSave);
 
-         return  tasksMapper.toResponse(taskToSave);
+        //Label
+        if (createTaskInput.getLabels() != null && !createTaskInput.getLabels().isEmpty()) {
+            taskLabelService.createManyTaskLabel(savedTask, createTaskInput.getLabels());
+        }
 
+        tasksRepository.flush();
+
+        Task fullTask = tasksRepository.findByIdWithLabels(savedTask.getId())
+                .orElseThrow(()-> new ItemNotFoundException("No se encontraron resultados"));
+
+        return tasksMapper.toResponse(fullTask);
 
     }
 
