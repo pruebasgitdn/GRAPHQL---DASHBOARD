@@ -47,8 +47,8 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
         List<WorkspaceMember> workspaceMembers = workspaceMemberRepository.findAll();
 
         return workspaceMembers.stream()
-                .map(workspaceMemberMapper::toResponse)
-                .collect(Collectors.toList());
+                .map(workspaceMemberMapper::toResponse)// op.intermedia mapea los items para toresponse => .filter seria de op.primera
+                .collect(Collectors.toList()); //op.terminal, los colecta en la lista con tolist
     }
 
     @Transactional(readOnly = true)

@@ -1,14 +1,14 @@
 package com.back.controllers;
 
 
-import com.back.entities.Task;
-import com.back.entities.User;
+import com.back.dataloader.SubTaskDataLoader;
 import com.back.entities.dto.*;
-import com.back.entities.mappers.TasksMapper;
 import com.back.security.UserDetailsImpl;
 import com.back.services.SubTaskService;
 import com.back.services.TasksService;
+import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
+import org.dataloader.DataLoader;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -19,6 +19,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Controller
 @RequiredArgsConstructor
@@ -91,11 +92,22 @@ public class GraphQLTasksController {
         return tasksService.editTask(taskId,editTaskInput);
     }
 
+//    @SchemaMapping(typeName = "TaskResponse", field = "subTasks")
+//    public List<SubTaskResponse> resolveSubTasks(TaskResponse taskResponse) {
+//
+//        return subTaskService.getSubTasksByTaskId(taskResponse.getId());
+//
+//    }
+
     @SchemaMapping(typeName = "TaskResponse", field = "subTasks")
-    public List<SubTaskResponse> resolveSubTasks(TaskResponse taskResponse) {
+    public CompletableFuture<List<SubTaskResponse>> resolveSubTasks(
+            TaskResponse taskResponse,
+            DataFetchingEnvironment environment
+    ) {
+        DataLoader<Long, List<SubTaskResponse>> loader =
+                environment.getDataLoader(SubTaskDataLoader.SUBTASK_LOADER);
 
-        return subTaskService.getSubTasksByTaskId(taskResponse.getId());
-
+        return loader.load(taskResponse.getId());
     }
 
 

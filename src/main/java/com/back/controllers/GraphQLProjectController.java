@@ -1,4 +1,6 @@
 package com.back.controllers;
+import com.back.dataloader.SubTaskDataLoader;
+import com.back.dataloader.TaskDataLoader;
 import com.back.entities.*;
 import com.back.entities.dto.*;
 import com.back.entities.mappers.TasksMapper;
@@ -6,7 +8,9 @@ import com.back.entities.mappers.WorkspaceMapper;
 import com.back.security.UserDetailsImpl;
 import com.back.services.ProjectService;
 import com.back.services.WorkspaceMemberService;
+import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
+import org.dataloader.DataLoader;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 
 @Controller
@@ -84,6 +89,17 @@ public class GraphQLProjectController {
 //    public List<TaskResponse> tasks(Project project) {
 //        return tasksMapper.mapTasks(project.getTasks());
 //    }
+
+    @SchemaMapping(typeName = "ProjectResponse", field = "tasks")
+    public CompletableFuture<List<TaskResponse>> resolveTasks(
+            ProjectResponse projectResponse,
+            DataFetchingEnvironment environment
+    ) {
+        DataLoader<Long, List<TaskResponse>> loader =
+                environment.getDataLoader(TaskDataLoader.TASK_LOADER);
+
+        return loader.load(projectResponse.getId());
+    }
 
 
 

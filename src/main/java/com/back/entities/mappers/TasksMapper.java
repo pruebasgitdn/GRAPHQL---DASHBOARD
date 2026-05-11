@@ -79,9 +79,29 @@ public class TasksMapper {
                 .build();
     }
 
+
+    //sinproject para evitar dependencias circulares
+    public TaskResponse toResponseWithoutProject(Task task){
+
+        UserResponse owner = userMapper.toResponse(task.getOwner());
+
+        return TaskResponse.builder()
+                .id(task.getId())
+                .title(task.getTitle())
+                .description(task.getDescription())
+                .status(task.getStatus())
+                .isArchived(task.getIsArchived())
+                .estimatedHours(task.getEstimatedHours())
+                .actualHours(task.getActualHours())
+                .completedAt(task.getCompletedAt())
+                .priority(task.getPriority())
+                .owner(owner)
+                .dueDate(task.getDueDate())
+                .createdAt(task.getCreatedAt())
+                .build();
+    }
+
     public Task toEntity(TaskResponse task){
-
-
 
         return Task.builder()
                 .id(task.getId())

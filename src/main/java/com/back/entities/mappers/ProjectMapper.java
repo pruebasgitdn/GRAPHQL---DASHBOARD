@@ -2,9 +2,13 @@ package com.back.entities.mappers;
 
 
 import com.back.entities.Project;
+import com.back.entities.SubTask;
 import com.back.entities.dto.EditProjectInput;
 import com.back.entities.dto.ProjectResponse;
+import com.back.entities.dto.SubTaskResponse;
+import com.back.entities.dto.TaskResponse;
 import com.back.repositories.TasksRepository;
+import com.back.services.TaskMappingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,7 +22,10 @@ public class ProjectMapper {
 
     private final WorkspaceMapper workspaceMapper;
     private final UserMapper userMapper;
+//    private final TasksMapper tasksMapper;
     private final TasksRepository tasksRepository;
+
+    private final TaskMappingService taskMappingService;
 
     public ProjectResponse toResponseWithTasksCount(Project project, Long taskCount) {
         return ProjectResponse.builder()
@@ -29,6 +36,12 @@ public class ProjectMapper {
                 .status(project.getStatus())
                 .dueDate(project.getDueDate())
                 .startDate(project.getStartDate())
+                .tasks(
+                project.getTasks() == null
+                        ? List.of()
+                        : project.getTasks().stream()
+                        //sinproject para evitar dependencias circulares
+                        .map(p ->taskMappingService.toResponseWithoutProject(p)).toList())
                 .workspace(workspaceMapper.toResponseWithoutCount(project.getWorkspace()))
                 .tasksCount(taskCount)
                 .build();
@@ -56,23 +69,18 @@ public class ProjectMapper {
                 .status(project.getStatus())
                 .dueDate(project.getDueDate())
                 .startDate(project.getStartDate())
+                .tasks(
+                        project.getTasks() == null
+                                ? List.of()
+                                : project.getTasks().stream()
+                                //sinproject para evitar dependencias circulares
+                                .map(p ->taskMappingService.toResponseWithoutProject(p)).toList())
                 .workspace(workspaceMapper.toResponseWithoutCount(project.getWorkspace()))
                 .build();
     }
 
 
 
-    public List<ProjectResponse> mapProjects(List<Project> projects) {
-        return projects.stream()
-                .map(project -> ProjectResponse.builder()
-                        .id(project.getId())
-                        //.tasks(tasksMapper.mapTasks(project.getTasks()))
-                        .workspace(workspaceMapper.toResponseWithoutCount(project.getWorkspace()))
-                        .name(project.getDescription())
-                        .name(project.getName())
-                        .build())
-                .toList();
-    }
 
 
     public void updateProjectFromDto(EditProjectInput input, Project project) {

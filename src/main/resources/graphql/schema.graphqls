@@ -88,6 +88,7 @@ type ProjectResponse {
     dueDate:LocalDate!
     status:ProjectStatus!
     owner:User!
+    tasks:[TaskResponse]
     isArchived:Boolean
 
 }
