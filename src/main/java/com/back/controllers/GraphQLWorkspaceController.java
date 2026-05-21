@@ -1,16 +1,17 @@
 package com.back.controllers;
+import com.back.dataloader.ProjectDataLoader;
+import com.back.dataloader.TaskDataLoader;
 import com.back.entities.User;
-import com.back.entities.dto.CreateWorkspaceInput;
-import com.back.entities.dto.UserInput;
-import com.back.entities.dto.WorkSpaceDetailResponse;
-import com.back.entities.dto.WorkspaceResponse;
+import com.back.entities.dto.*;
 import com.back.repositories.UserRepository;
 import com.back.security.UserDetailsImpl;
 import com.back.services.WorkspaceMemberService;
 import com.back.services.WorkspaceService;
+import graphql.schema.DataFetchingEnvironment;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.dataloader.DataLoader;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Controller;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 
 @Controller
@@ -32,7 +34,8 @@ public class GraphQLWorkspaceController {
     private final WorkspaceService workspaceService;
     private final UserRepository userRepository;
 
-
+    //TODO: Implementar dataloader para owner o schemamapping
+    //TODO: Dataloader para owner
 
     @PreAuthorize("isAuthenticated()")
     @MutationMapping(name = "createWorkspace")
@@ -102,6 +105,19 @@ public class GraphQLWorkspaceController {
 
         return workspaceService.removeWorkspace(workspace_id,authenticated.getId());
     }
+
+
+@SchemaMapping(typeName = "WorkSpaceDetailResponse", field = "projects")
+public CompletableFuture<List<ProjectSimpleResponse>> resolveProjects(
+        WorkSpaceDetailResponse workSpaceDetailResponse,
+        DataFetchingEnvironment environment
+) {
+
+    DataLoader<UUID, List<ProjectSimpleResponse>> loader =
+            environment.getDataLoader(ProjectDataLoader.PROJECT_LOADER);
+
+    return loader.load(workSpaceDetailResponse.getId());
+}
 
 
     //El de editar name porque sus relaciones se manejan desde los servicios

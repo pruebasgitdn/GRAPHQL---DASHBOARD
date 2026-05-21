@@ -27,38 +27,12 @@ public class TaskDataLoader {
 
 
 
-//    @Bean
-//    public BatchLoaderRegistry tasksBatchLoader() {
-//        DefaultBatchLoaderRegistry registry = new DefaultBatchLoaderRegistry();
-//
-//        //registrar => tipo long y list
-//        registry.forTypePair(Long.class, List.class)
-//                .withName(TASK_LOADER) //nombre del metodo que invoca el dataloader
-//                .registerMappedBatchLoader((projectId, env) -> {
-//
-//                    List<Task> all = tasksRepository.findAllByProjectIdIn(projectId);
-//
-//                    Map<Long, List> grouped = new HashMap<>();
-//                    for (Task task : all) {
-//
-//                        Long taskId = task.getId();
-//                        // actua solo cuando la clave no esta presente en el mapa o cuando su valor asociado es null
-//                        grouped.computeIfAbsent(taskId, k -> new ArrayList<>())
-//                                .add(tasksMapper.toResponse(task)); //Entonces lo añade
-//                    }
-//
-//                    return Mono.just(grouped);
-//                });
-//
-//        return registry;
-//    }
-
-
     @Bean
     public RuntimeWiringConfigurer taskLoader(BatchLoaderRegistry registry) {
 
         registry.forTypePair(Long.class, List.class)
-                .withName(TASK_LOADER)
+                .withName(TASK_LOADER) //Multiples <long> ids de los tan que los junta
+                //en esa sola ejecucion para evitar el N+1
                 .registerMappedBatchLoader((Set<Long> projectIds, BatchLoaderEnvironment env) -> {
 
                     List<Task> all = tasksRepository.findAllByProjectIdIn(projectIds);
@@ -66,7 +40,7 @@ public class TaskDataLoader {
                     Map<Long, List> grouped = new HashMap<>();
 
                     for (Task task : all) {
-                        Long projectId = task.getProject().getId();  // ← ¡¡POR PROJECT_ID!! 🔥
+                        Long projectId = task.getProject().getId();  // ← POR PROJECT_ID
 
                         grouped.computeIfAbsent(projectId, k -> new ArrayList<>())
                                 .add(tasksMapper.toResponseWithoutProject(task));

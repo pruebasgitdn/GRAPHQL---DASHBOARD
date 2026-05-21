@@ -171,7 +171,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         //Verificar que el autenticado sea admin o owner
         boolean isAdminOrOwner = workspaceMemberService.isAdminOrOwner(owner_id,workspace_id);
-        System.out.println("Eres admin u owner? "+isAdminOrOwner);
+        //System.out.println("Eres admin u owner? "+isAdminOrOwner);
         if (!isAdminOrOwner) {
             throw new RuntimeException("No tienes permisos");
         }
@@ -237,15 +237,42 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
         //  guardar los miembros en el espacio de trabajo
         workspace.getMembers().addAll(newMembers);
-
-
-
-
-
         Long projectCount = projectRepository.countByWorkspaceId(workspace.getId());
         Long memberCount =  workspaceMemberRepository.countByWorkspaceId(workspace.getId());
 
         // Retornar
+        return workspaceMapper.toResponse(workspace,memberCount,projectCount);
+    }
+
+    @Override
+    public WorkspaceResponse addMemberToWorkspaceAfterLink(UUID userId, UUID workspace_id) {
+
+
+        if(userId == null){
+            throw  new RuntimeException("Ingresa el usuario");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->{
+                    throw  new ItemNotFoundException("Usuario no encontrado");
+                });
+
+        Workspace workspace = workspaceRepository.findById(workspace_id)
+                .orElseThrow(() ->{
+                    throw  new ItemNotFoundException("Espacio de trabajo no encontrado");
+                });
+
+
+        WorkspaceMember wm = new WorkspaceMember();
+        wm.setWorkspace(workspace);
+        wm.setUser(user);
+        wm.setRole(Role.MEMBER);
+
+         workspace.getMembers().add(wm);
+
+         Long projectCount =projectRepository.countByWorkspaceId(workspace.getId());
+        Long memberCount =  workspaceMemberRepository.countByWorkspaceId(workspace.getId());
+
         return workspaceMapper.toResponse(workspace,memberCount,projectCount);
     }
 

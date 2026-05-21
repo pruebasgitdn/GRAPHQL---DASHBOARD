@@ -25,18 +25,6 @@ public class TasksMapper {
     private final ProjectMapper projectMapper;
     private final UserMapper  userMapper;
 
-    public List<TaskResponse> mapTasks(List<Task> tasks) {
-        return tasks.stream()
-                .map(task -> TaskResponse.builder()
-                        .id(task.getId())
-                       .project(projectMapper.toResponseWithoutCount(task.getProject()))
-                        .description(task.getDescription())
-                        .title(task.getTitle())
-                        .priority(task.getPriority())
-                        .status(task.getStatus())
-                        .build())
-                .toList();
-    }
 
     public TaskResponse toResponse(Task task){
 

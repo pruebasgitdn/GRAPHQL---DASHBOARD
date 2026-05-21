@@ -49,7 +49,6 @@ type TaskResponse {
     id: Int
     title: String
     description: String
-    project: ProjectResponse
     status: TaskStatus
     priority: TaskPriority
     estimatedHours: Float
@@ -328,7 +327,9 @@ type Mutation {
 
     createSubTasks(inputs: [CreateSubTask]!,taskId: Int!):[SubTaskResponse]
 
+    sendInvitation(workspaceId: ID!, email:String!):String
 
+    confirmInvitation(token:String!):String
 }
 
 

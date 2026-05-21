@@ -3,10 +3,7 @@ package com.back.entities.mappers;
 
 import com.back.entities.Project;
 import com.back.entities.SubTask;
-import com.back.entities.dto.EditProjectInput;
-import com.back.entities.dto.ProjectResponse;
-import com.back.entities.dto.SubTaskResponse;
-import com.back.entities.dto.TaskResponse;
+import com.back.entities.dto.*;
 import com.back.repositories.TasksRepository;
 import com.back.services.TaskMappingService;
 import lombok.RequiredArgsConstructor;
@@ -76,6 +73,19 @@ public class ProjectMapper {
                                 //sinproject para evitar dependencias circulares
                                 .map(p ->taskMappingService.toResponseWithoutProject(p)).toList())
                 .workspace(workspaceMapper.toResponseWithoutCount(project.getWorkspace()))
+                .build();
+    }
+
+    public ProjectSimpleResponse toSimpleResponseWithoutCount(Project project){
+
+        return ProjectSimpleResponse.builder()
+                .id(project.getId())
+                .name(project.getName())
+                .description(project.getDescription())
+                .tasksCount((long) project.getTasks().size())
+                .createdAt(project.getCreatedAt())
+                .startDate(project.getStartDate())
+                .status(project.getStatus())
                 .build();
     }
 

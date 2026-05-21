@@ -4,6 +4,7 @@ import com.back.entities.Project;
 import com.back.entities.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,6 +23,11 @@ public interface ProjectRepository extends JpaRepository<Project,Long> {
     boolean existsByName(String name);
 
     Long countByWorkspaceId(UUID id);
+
+
+    //El collection es una estructura de datos q me permite
+    //Agrupar multiples elementos en una unidad
+    List<Project> findAllByWorkspaceIdIn(Collection<UUID> workspaceId);
 
 
 }

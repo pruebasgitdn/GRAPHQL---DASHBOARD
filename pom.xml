@@ -37,6 +37,13 @@
 			<version>1.6.3</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.resend</groupId>
+			<artifactId>resend-java</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+
+
 
 		<!-- WebFlux (necesario para subscriptions reactivas) -->
 		<dependency>

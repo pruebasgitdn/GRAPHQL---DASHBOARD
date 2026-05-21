@@ -7,10 +7,7 @@ import com.back.exceptions.GraphQLExceptionHandler;
 import com.back.exceptions.InvalidCredentialsException;
 import com.back.exceptions.UserNotFoundException;
 import com.back.repositories.UserRepository;
-import com.back.services.AuthenticationService;
-import com.back.services.CookieService;
-import com.back.services.NotificationPublisherService;
-import com.back.services.UserService;
+import com.back.services.*;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -47,6 +44,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserMapper userMapper;
     private final UserService userService;
 
+    private final EmailService emailService;
+
     @Value("${jwt.secret}")
     private String secretKey;
     private final Long jwtExpiryMs = 86400000L;
@@ -81,6 +80,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         //Conexion subscripcion sink
         //notificationPublisher.subscribe(userEntity.getId().toString());
 
+
+        emailService.sendEmail();
         return AuthResponse.builder()
                 .token(jwtToken)
                 .refreshToken(generateRefreshToken(userDetails))

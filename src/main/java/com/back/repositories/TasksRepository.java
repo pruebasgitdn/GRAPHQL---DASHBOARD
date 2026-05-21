@@ -24,6 +24,8 @@ public interface TasksRepository extends JpaRepository<Task,Long> {
 
     List<Task> findAllByProjectId(Long projectId);
 
+    //El collection es una estructura de datos q me permite
+    //Agrupar multiples elementos en una unidad
     List<Task> findAllByProjectIdIn(Collection<Long> projectId);
 
     Long countByProjectId(Long projectId);

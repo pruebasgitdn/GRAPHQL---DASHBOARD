@@ -20,6 +20,10 @@ public interface WorkspaceService {
 
     WorkspaceResponse addMemberToWorkspace(List<UUID> users, UUID workspace_id,UUID owner_id);
 
+    //sin verificar el owner pq se añade cuando el invitado acepte en en el link
+    WorkspaceResponse addMemberToWorkspaceAfterLink(UUID userId, UUID workspace_id);
+
+
     WorkspaceResponse removeMembersFromWorkspace(List<UUID> users, UUID workspace_id,UUID owner_id);
 
     Boolean removeWorkspace( UUID workspace_id,UUID owner_id);

@@ -74,19 +74,25 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
 
         //encontrar tarea
         TaskResponse taskResponse = tasksService.getTask(taskId);
+        if(taskResponse == null){
+            throw new ItemNotFoundException("Tarea no encontrada");
+        }
 
         //encontrar user
         UserResponse user = userService.findById(user_assign);
-
+        if(user == null){
+            throw new ItemNotFoundException("Usuario no encontrado");
+        }
 
         //ecntonrar espacio de trabjo
         UUID workspaceId = taskResponse.getProject().getWorkspace().getId();
-
-
-        if (!workspaceMemberService.isAdminOrOwner(currentUser, workspaceId)) {
-            throw new RuntimeException("No tienes permisos para asignar tareas en este espacio de trabajo");
+        if(workspaceId == null){
+            throw new ItemNotFoundException("Espacio de trabajo no encontrado");
         }
 
+        if (!workspaceMemberService.isMember(workspaceId,currentUser)) {
+            throw new RuntimeException("No eres miembro del espacio para asignar una tarea");
+        }
 
         if(!workspaceMemberService.isMember(workspaceId,user.getId())){
             throw new RuntimeException("El usuario asignado no es miembro del espacio de trabajo");

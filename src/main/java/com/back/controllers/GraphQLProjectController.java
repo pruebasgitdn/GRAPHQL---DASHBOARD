@@ -101,6 +101,4 @@ public class GraphQLProjectController {
         return loader.load(projectResponse.getId());
     }
 
-
-
 }

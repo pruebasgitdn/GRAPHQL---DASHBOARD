@@ -22,6 +22,8 @@ public class GrapQLTaskAssigneeController {
 
     private final TaskAssigneeService taskAssigneeService;
 
+    //TODO: Crear muchas asignaciones => en base a los miembrosdelworkspace
+
     // Crear asignacion
     @PreAuthorize("isAuthenticated()")
     @MutationMapping(name = "createAssignation")
