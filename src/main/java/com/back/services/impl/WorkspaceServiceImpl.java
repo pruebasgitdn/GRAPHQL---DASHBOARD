@@ -17,6 +17,7 @@ import com.back.repositories.*;
 import com.back.services.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -151,7 +152,9 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
 
-
+    //cachear ese key value para redis
+    //@Cacheable -> RedisCacheMAnager -> Redis
+    @Cacheable(value = "workspace", key = "#id")
     @Override
     public WorkSpaceDetailResponse findById(UUID id) {
 

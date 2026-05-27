@@ -20,4 +20,6 @@ public interface WorkspaceMemberService {
 
     List<MemberRoleResponse> getMembersFromWorkspace(UUID workspace_id);
 
+    Boolean leaveGroup(UUID workspaceId, UUID userId);
+
 }

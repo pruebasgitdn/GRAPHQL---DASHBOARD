@@ -3,7 +3,6 @@ import com.back.entities.User;
 import com.back.entities.dto.AuthResponse;
 import com.back.entities.dto.UserResponse;
 import com.back.entities.mappers.UserMapper;
-import com.back.exceptions.GraphQLExceptionHandler;
 import com.back.exceptions.InvalidCredentialsException;
 import com.back.exceptions.UserNotFoundException;
 import com.back.repositories.UserRepository;
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,7 +26,7 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
+
 
 
 @Service
@@ -44,7 +42,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserMapper userMapper;
     private final UserService userService;
 
-    private final EmailService emailService;
+    //private final EmailService emailService;
+
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -80,8 +79,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         //Conexion subscripcion sink
         //notificationPublisher.subscribe(userEntity.getId().toString());
 
+        //emailService.sendEmail();
 
-        emailService.sendEmail();
         return AuthResponse.builder()
                 .token(jwtToken)
                 .refreshToken(generateRefreshToken(userDetails))

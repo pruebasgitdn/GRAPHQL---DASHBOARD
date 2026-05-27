@@ -13,7 +13,7 @@ import java.util.UUID;
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor //melo para el cache de redis
 public class WorkSpaceDetailResponse {
 
     private UUID id;

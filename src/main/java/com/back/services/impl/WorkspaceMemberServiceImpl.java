@@ -1,5 +1,7 @@
 package com.back.services.impl;
 
+import com.back.entities.User;
+import com.back.entities.Workspace;
 import com.back.entities.WorkspaceMember;
 import com.back.entities.dto.MemberRoleResponse;
 import com.back.entities.dto.WorkspaceMemberResponse;
@@ -102,5 +104,25 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
         return wmembers.stream()
                 .map(workspaceMemberMapper::toMemberRole)
                 .toList();
+    }
+
+    @Transactional
+    @Override
+    public Boolean leaveGroup(UUID workspaceId, UUID userId) {
+
+        //
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(()->{
+                    throw new ItemNotFoundException("Espacio de trabajo no encontrado");
+                });
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(()->{
+                    throw new ItemNotFoundException("Usuario no encontrado");
+                });
+
+        workspaceMemberRepository.deleteByWorkspace_IdAndUser_Id(workspace.getId(),user.getId());
+
+        return true;
     }
 }

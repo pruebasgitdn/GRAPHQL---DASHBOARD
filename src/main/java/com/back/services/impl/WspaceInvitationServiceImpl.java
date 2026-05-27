@@ -19,6 +19,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -63,11 +66,53 @@ public class WspaceInvitationServiceImpl implements WspaceInvitationService {
                 .build();
 
 
-workspaceInvitationRepository.save(invitation);
+        workspaceInvitationRepository.save(invitation);
 
-emailService.sendWorkspaceInvitation(email,token,workspace.getName());
+        emailService.sendWorkspaceInvitation(email,token,workspace.getName());
 
         return "Invitación enviada a " + email+", Se espera su respuesta  ";
+    }
+
+    @Override
+    public String sendMultipleInvitesToWspace(UUID workspaceId, List<String> emails) {
+
+
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(()->{
+                    throw  new ItemNotFoundException("Este espacio de trabajo no existe: "+workspaceId);
+                });
+
+        Set<String> uniqueUserEmails = new HashSet<>(emails);
+
+        //Encontras usuarios
+        List<User> usersToAdd = userRepository.findAllByEmailIn(uniqueUserEmails);
+        if(usersToAdd.size() != uniqueUserEmails.size() ){
+            throw new ItemNotFoundException("Uno o mas correos no existen");
+        }
+
+
+        usersToAdd.forEach(user -> {
+
+            String token = UUID.randomUUID().toString();
+
+            WorkspaceInvitation invitation = WorkspaceInvitation.builder()
+                    .token(token)
+                    .workspace(workspace)
+                    .invitedUser(user)
+                    .status(InvitationStatus.PENDING)
+                    .expiresAt(LocalDateTime.now().plusHours(2))
+                    .build();
+
+            workspaceInvitationRepository.save(invitation);
+
+            emailService.sendWorkspaceInvitation(
+                    user.getEmail(),
+                    token,
+                    workspace.getName()
+            );
+        });
+
+        return "Invitaciones enviadas con éxito";
     }
 
     @Override
@@ -92,8 +137,8 @@ emailService.sendWorkspaceInvitation(email,token,workspace.getName());
                 workspaceInvitation.getInvitedUser().getId()
                 ,workspaceInvitation.getWorkspace().getId());
 
-        Workspace workspacetoSave = workspaceMapper.toEntityWithoutCount(workspace);
-        workspaceRepository.save(workspacetoSave);
+//        Workspace workspacetoSave = workspaceMapper.toEntityWithoutCount(workspace);
+//        workspaceRepository.save(workspacetoSave);
 
         //guardar aceptada
         workspaceInvitation.setStatus(InvitationStatus.ACCEPTED);

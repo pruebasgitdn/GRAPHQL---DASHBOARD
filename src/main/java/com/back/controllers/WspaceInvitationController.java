@@ -9,6 +9,7 @@ import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -24,6 +25,15 @@ public class WspaceInvitationController {
                                  @Argument(name = "email") String email ){
 
         return  wspaceInvitationService.inviteUserToWspace(workspaceId,email);
+    }
+
+
+    @PreAuthorize("isAuthenticated()")
+    @MutationMapping(name = "sendMultipleInvitations")
+    public String sendMultipleInvitations(@Argument(name = "workspaceId") UUID workspaceId ,
+                                 @Argument(name = "emails") List<String> emails){
+
+        return  wspaceInvitationService.sendMultipleInvitesToWspace(workspaceId,emails);
     }
 
     @PreAuthorize("isAuthenticated()")

@@ -9,6 +9,7 @@ import com.back.entities.dto.WorkspaceResponse;
 import com.back.exceptions.ItemNotFoundException;
 import com.back.repositories.UserRepository;
 import com.back.repositories.WorkspaceRepository;
+import com.back.security.UserDetailsImpl;
 import com.back.services.WorkspaceMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -77,28 +79,12 @@ public class GraphQLWorkspaceMembersController {
         return  workspaceMemberService.isMember(workspaceId,userId);
     }
 
-
-//    @SchemaMapping(typeName = "WorkspaceMembersResponse", field = "users","workspace")
-//    public WorkspaceMembersResponse resolveMembersAndWorkspace(WorkspaceMembersResponse workspaceMembersResponse) {
-//        List<User> usersToAdd = userRepository.findAllById(users_id);
-//        if(usersToAdd.size() != users_id.size() ){
-//            throw new ItemNotFoundException("Uno o mas IDs no existen");
-//        }
-//
-//        List<User> users = new ArrayList<User>(workspaceMembersResponse.getUsers());
-//
-//        List<UUID> uids = users.stream().map(User::getId).toList();
-//
-//        List<User> foundUsers = userRepository.findAllById(uids);
-//
-//        if () {
-//            throw new ItemNotFoundException("Uno o mas usuarios no encontrados");
-//
-//        }
-//
-//
-//        return
-//    }
+    @QueryMapping(name = "leaveGroup")
+    public Boolean leaveGroup(@Argument(name = "workspaceId") UUID workspaceId,
+                              @AuthenticationPrincipal UserDetailsImpl user
+    ){
+        return  workspaceMemberService.leaveGroup(workspaceId,user.getId());
+    }
 
 
 

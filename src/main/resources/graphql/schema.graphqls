@@ -292,6 +292,7 @@ type Query {
 
     allConnections: [String]
 
+    leaveGroup(workspaceId:ID!): Boolean
 
 }
 
@@ -328,6 +329,8 @@ type Mutation {
     createSubTasks(inputs: [CreateSubTask]!,taskId: Int!):[SubTaskResponse]
 
     sendInvitation(workspaceId: ID!, email:String!):String
+
+    sendMultipleInvitations(workspaceId: ID!, emails:[String]!):String
 
     confirmInvitation(token:String!):String
 }
