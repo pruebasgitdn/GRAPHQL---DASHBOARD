@@ -137,6 +137,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         return  workspaceMapper.toResponse(workspace,memberCount,projectCount);
     }
 
+    @Cacheable(value = "workspace", key = "'all'")
     @Transactional(readOnly = true)
     @Override
     public List<WorkspaceResponse> findAll() {
@@ -195,12 +196,10 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         }
 
 
-
         //Encontrar grupo
         Workspace workspace = workspaceRepository.findById(workspace_id).orElseThrow(()->{
             throw  new ItemNotFoundException("Worspace no encontrado por el id : "+workspace_id);
         });
-
 
 
         //IDS de usuarios del workspace existente
@@ -351,6 +350,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         workspace.getMembers().clear();
 
         workspaceRepository.deleteById(workspace_id);
+
+        //TODO: Notification emitir a los miembros que se elimino
 
         return true;
 

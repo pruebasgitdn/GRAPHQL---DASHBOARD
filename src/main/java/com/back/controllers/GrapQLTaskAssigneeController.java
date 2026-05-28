@@ -37,7 +37,7 @@ public class GrapQLTaskAssigneeController {
         UUID user_id = authenticated.getId();
 
         return  taskAssigneeService.createAssignation(taskAssigneeInput.getTaskId()
-                ,taskAssigneeInput.getUserId(),user_id);
+                ,taskAssigneeInput.getUserId(),user_id,taskAssigneeInput.getWorkspaceId());
 
 
     }
@@ -71,6 +71,7 @@ public class GrapQLTaskAssigneeController {
     @PreAuthorize("isAuthenticated()")
     @QueryMapping(name = "deleteAssignationByTaskId")
     public Boolean deleteAssignationByTaskId(@Valid @Argument Long taskId,
+            @Valid @Argument UUID workspaceId,
             @AuthenticationPrincipal UserDetailsImpl authenticated
     ){
 
@@ -79,7 +80,7 @@ public class GrapQLTaskAssigneeController {
 
         }
 
-        return  taskAssigneeService.deleteAssignationByTaskId(taskId,authenticated.getId());
+        return  taskAssigneeService.deleteAssignationByTaskId(taskId,authenticated.getId(),workspaceId);
     }
 
 }

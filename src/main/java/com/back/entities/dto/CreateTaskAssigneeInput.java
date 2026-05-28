@@ -21,6 +21,10 @@ public class CreateTaskAssigneeInput {
     @NotNull(message = "La tarea debe ir asociado a un proyecto")
     private UUID userId;
 
+    @NotNull(message = "Ingresalo, para saber si es miembro de ese espacio")
+    private UUID workspaceId;
+
+
 
 
 }

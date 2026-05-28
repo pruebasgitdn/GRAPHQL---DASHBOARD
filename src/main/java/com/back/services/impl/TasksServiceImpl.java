@@ -18,6 +18,7 @@ import com.back.repositories.UserRepository;
 import com.back.services.TaskLabelService;
 import com.back.services.TasksService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,6 +105,8 @@ public class TasksServiceImpl implements TasksService {
                 .toList();
     }
 
+    @Cacheable(value = "task", key = "#id")
+    @Transactional(readOnly = true)
     @Override
     public TaskResponse getTask(Long id) {
 
@@ -115,6 +118,8 @@ public class TasksServiceImpl implements TasksService {
         return tasksMapper.toResponse(task);
     }
 
+
+    @Cacheable(value = "tasksByProject", key = "#projectId")
     @Transactional(readOnly = true)
     @Override
     public List<TaskResponse> findAllByProjectId(Long projectId) {

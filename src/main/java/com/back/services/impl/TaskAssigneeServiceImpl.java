@@ -46,7 +46,7 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
 
     @Override
     @Transactional
-    public Boolean deleteAssignationByTaskId(Long taskId, UUID currentUser) {
+    public Boolean deleteAssignationByTaskId(Long taskId, UUID currentUser,UUID workspaceId) {
 
         //encontrar tarea => aca mismo en el service tira el trhow de si no existe ...
         TaskResponse taskResponse = tasksService.getTask(taskId);
@@ -56,7 +56,7 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
 
 
         //ecntonrar espacio de trabjo
-        UUID workspaceId = taskResponse.getProject().getWorkspace().getId();
+        //UUID workspaceId = taskResponse.getProject().getWorkspace().getId();
 
 
         if (!workspaceMemberService.isAdminOrOwner(currentUser, workspaceId)) {
@@ -70,7 +70,7 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
 
     @Transactional
     @Override
-    public TaskAssigneeResponse createAssignation(Long taskId, UUID user_assign, UUID currentUser) {
+    public TaskAssigneeResponse createAssignation(Long taskId, UUID user_assign, UUID currentUser,UUID workspaceId) {
 
         //encontrar tarea
         TaskResponse taskResponse = tasksService.getTask(taskId);
@@ -85,7 +85,7 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
         }
 
         //ecntonrar espacio de trabjo
-        UUID workspaceId = taskResponse.getProject().getWorkspace().getId();
+       // UUID workspaceId = taskResponse.getProject().getWorkspace().getId();
         if(workspaceId == null){
             throw new ItemNotFoundException("Espacio de trabajo no encontrado");
         }

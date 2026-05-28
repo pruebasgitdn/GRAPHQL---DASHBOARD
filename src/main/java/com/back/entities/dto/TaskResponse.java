@@ -27,7 +27,7 @@ public class TaskResponse {
 
     private String description;
 
-    private ProjectResponse project;
+  //  private Long projectId;
 
     private TaskStatus status;
 

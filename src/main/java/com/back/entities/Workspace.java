@@ -30,14 +30,13 @@ public class Workspace {
 
     private String color;
 
-    //El logueado
     // R 1:1
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
 
-    //Relaciones 1:N
+    //R 1:N
     @Builder.Default
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<WorkspaceMember> members = new ArrayList<>();

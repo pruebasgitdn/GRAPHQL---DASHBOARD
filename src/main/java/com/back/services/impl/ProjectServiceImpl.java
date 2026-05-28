@@ -21,6 +21,7 @@ import com.back.services.UserService;
 import com.back.services.WorkspaceMemberService;
 import com.back.services.WorkspaceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -115,6 +116,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
+    @Cacheable(value = "project", key = "#id")
     @Transactional(readOnly = true)
     @Override
     public ProjectResponse getProject(Long id) {

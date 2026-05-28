@@ -7,9 +7,9 @@ import java.util.UUID;
 
 public interface TaskAssigneeService {
 
-    Boolean deleteAssignationByTaskId(Long taskId,UUID currentUser);
+    Boolean deleteAssignationByTaskId(Long taskId,UUID currentUser,UUID workspaceId);
 
-    TaskAssigneeResponse createAssignation(Long taskId, UUID user_assign, UUID currentUser);
+    TaskAssigneeResponse createAssignation(Long taskId, UUID user_assign, UUID currentUser,UUID workspaceId);
 
     List<TaskAssigneeResponse> assignationsByUserId(UUID owner);
 

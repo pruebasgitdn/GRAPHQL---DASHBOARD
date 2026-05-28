@@ -121,6 +121,7 @@ type AuthResponse {
 input CreateTaskAssigneeInput {
     taskId: Int!
     userId: ID!
+    workspaceId: ID!
 }
 
 type TaskAssigneeResponse {
@@ -288,7 +289,7 @@ type Query {
 
     assignationsByTaskId(taskId: Int!): [TaskAssigneeResponse!]
 
-    deleteAssignationByTaskId(taskId: Int!): Boolean
+    deleteAssignationByTaskId(taskId: Int!,workspaceId: ID!): Boolean
 
     allConnections: [String]
 
