@@ -111,5 +111,19 @@ public class WorkspaceMapper {
     }
 
 
+
+    public void updateWorkspaceFromDto(EditWorkspaceInput input,Workspace workspace){
+
+        if(input.getName() != null){
+            workspace.setName(input.getName());
+        }
+
+        if(input.getColor() != null){
+            workspace.setColor(input.getColor());
+        }
+
+    }
+
+
 }
 

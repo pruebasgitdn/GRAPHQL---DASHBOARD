@@ -17,7 +17,9 @@ import com.back.repositories.*;
 import com.back.services.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -137,7 +139,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         return  workspaceMapper.toResponse(workspace,memberCount,projectCount);
     }
 
-    @Cacheable(value = "workspace", key = "'all'")
+    @Cacheable(value = "workspaces", key = "'all'")
     @Transactional(readOnly = true)
     @Override
     public List<WorkspaceResponse> findAll() {
@@ -357,5 +359,33 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
 
 
+    }
+
+    @Override
+    @Caching(evict = {
+
+            @CacheEvict(value = "workspace", key = "#id"),
+            @CacheEvict(value = "workspaces", key = "'all'")
+    })
+    public WorkspaceResponse editWorkspace(EditWorkspaceInput input,UUID id,UUID ownerId) {
+
+        //bsucar
+        Workspace workspace = workspaceRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException("Espacio no encontrado"));
+
+        if(!workspaceMemberService.isAdminOrOwner(ownerId,workspace.getId())){
+            throw new RuntimeException("No tienes permisos para ejecutar dicha acción");
+        }
+
+        //validar mapper updt
+        workspaceMapper.updateWorkspaceFromDto(input,workspace);
+
+        //conteo
+        Long memberCount = workspaceMemberRepository.countByWorkspaceId(workspace.getId());
+        Long projectCount = projectRepository.countByWorkspaceId(workspace.getId());
+
+        workspaceRepository.save(workspace);
+
+        return workspaceMapper.toResponse(workspace,memberCount,projectCount);
     }
 }

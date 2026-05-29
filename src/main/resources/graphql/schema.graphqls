@@ -243,6 +243,11 @@ input EditProjectInput {
     taskIds: [ID!]
 }
 
+input EditWorkspaceInput {
+    name:String
+    color:String
+}
+
 type MemberRoleResponse {
     user: User
     role: Role
@@ -334,6 +339,8 @@ type Mutation {
     sendMultipleInvitations(workspaceId: ID!, emails:[String]!):String
 
     confirmInvitation(token:String!):String
+
+    editWorkspace(workspaceInput:EditWorkspaceInput,workspaceId:ID):WorkspaceResponse
 }
 
 

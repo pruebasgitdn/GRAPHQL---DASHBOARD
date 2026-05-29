@@ -48,6 +48,17 @@ public class GraphQLWorkspaceController {
         return workspaceService.createWorkspace(workspaceInput,user_id);
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @MutationMapping(name = "editWorkspace")
+    public WorkspaceResponse editWorkspace(@Valid @Argument EditWorkspaceInput workspaceInput,
+                                           @Valid @Argument UUID workspaceId,
+                                             @AuthenticationPrincipal UserDetailsImpl user){
+
+        UUID user_id = user.getId();
+
+        return workspaceService.editWorkspace(workspaceInput,workspaceId,user_id);
+    }
+
     @QueryMapping(name = "workspaceList")
     public List<WorkspaceResponse> workspaceList(){
         return workspaceService.findAll();

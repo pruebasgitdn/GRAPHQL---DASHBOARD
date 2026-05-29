@@ -27,7 +27,6 @@ public class Workspace {
     @Column(nullable = false)
     private String name;
 
-
     private String color;
 
     // R 1:1

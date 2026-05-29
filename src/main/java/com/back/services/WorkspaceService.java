@@ -2,10 +2,7 @@ package com.back.services;
 
 
 import com.back.entities.Workspace;
-import com.back.entities.dto.CreateProjectInput;
-import com.back.entities.dto.CreateWorkspaceInput;
-import com.back.entities.dto.WorkSpaceDetailResponse;
-import com.back.entities.dto.WorkspaceResponse;
+import com.back.entities.dto.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,4 +24,5 @@ public interface WorkspaceService {
 
     Boolean removeWorkspace( UUID workspace_id,UUID owner_id);
 
+    WorkspaceResponse editWorkspace(EditWorkspaceInput input,UUID id,UUID ownerId);
 }
