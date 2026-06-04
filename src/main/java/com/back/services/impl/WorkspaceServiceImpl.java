@@ -332,10 +332,15 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     @Transactional
     @Override
-    public Boolean removeWorkspace(UUID workspace_id,UUID owner_id) {
+    @Caching(evict = {
+
+            @CacheEvict(value = "workspace", key = "#id"),
+            @CacheEvict(value = "workspaces", key = "'all'")
+    })
+    public Boolean removeWorkspace(UUID id,UUID owner_id) {
 
         //Verificar que el autenticado sea admin o owner
-        boolean isAdminOrOwner = workspaceMemberService.isAdminOrOwner(owner_id,workspace_id);
+        boolean isAdminOrOwner = workspaceMemberService.isAdminOrOwner(owner_id,id);
         System.out.println("Eres admin u owner? "+isAdminOrOwner);
         if (!isAdminOrOwner) {
             throw new RuntimeException("No tienes permisos");
@@ -343,15 +348,15 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
 
         //Encontrar workspace
-        Workspace workspace = workspaceRepository.findById(workspace_id).orElseThrow(()->{
-            throw  new ItemNotFoundException("Worspace no encontrado por el id : "+workspace_id);
+        Workspace workspace = workspaceRepository.findById(id).orElseThrow(()->{
+            throw  new ItemNotFoundException("Worspace no encontrado por el id : "+id);
         });
 
 
         //eliminar de la relacion todos los usuarios asociados a dicho tan
         workspace.getMembers().clear();
 
-        workspaceRepository.deleteById(workspace_id);
+        workspaceRepository.deleteById(id);
 
         //TODO: Notification emitir a los miembros que se elimino
 

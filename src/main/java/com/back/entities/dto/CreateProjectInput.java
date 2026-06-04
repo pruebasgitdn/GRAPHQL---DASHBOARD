@@ -27,6 +27,7 @@ public class CreateProjectInput {
     @Size(max = 60,message = "Máximo 60 caracteres")
     private String name;
 
+    @Size(max = 200,message = "Máximo 200 caracteres")
     private String description;
 
     @NotNull(message = "Ingresa fecha de inicio")
@@ -40,6 +41,7 @@ public class CreateProjectInput {
 
     @NotNull(message = "El proyecto debe ir asociado a un espacio de trabajo(workspace)")
     private UUID workspaceId;
+
 
     @NotNull(message = "El proyecto debe ir asociado a un creador")
     private UUID ownerId;

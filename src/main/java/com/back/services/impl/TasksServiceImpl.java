@@ -18,7 +18,10 @@ import com.back.repositories.UserRepository;
 import com.back.services.TaskLabelService;
 import com.back.services.TasksService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.annotations.Cache;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -119,7 +122,7 @@ public class TasksServiceImpl implements TasksService {
     }
 
 
-    @Cacheable(value = "tasksByProject", key = "#projectId")
+    //@Cacheable(value = "tasksByProject", key = "#projectId")
     @Transactional(readOnly = true)
     @Override
     public List<TaskResponse> findAllByProjectId(Long projectId) {
@@ -138,11 +141,14 @@ public class TasksServiceImpl implements TasksService {
     }
 
     @Override
-    public TaskResponse editTask(Long taskId, EditTaskInput editTaskInput) {
+    @Caching(evict = {
+            @CacheEvict(value = "task", key = "#id")}
+    )
+    public TaskResponse editTask(Long id, EditTaskInput editTaskInput) {
 
         //encontrar por id
-        Task task = tasksRepository.findById(taskId).orElseThrow(()->{
-            throw  new ItemNotFoundException("No se se encontro tarea por el id: "+taskId);
+        Task task = tasksRepository.findById(id).orElseThrow(()->{
+            throw  new ItemNotFoundException("No se se encontro tarea por el id: "+id);
         });
 
 
@@ -155,9 +161,14 @@ public class TasksServiceImpl implements TasksService {
     }
 
     @Override
-    public Boolean deleteTask(Long taskId) {
+    @Caching(evict = {
+            @CacheEvict(value = "task", key = "#id")}
+    )
+    public Boolean deleteTask(Long id) {
 
-        tasksRepository.deleteById(taskId);
+
+        //TODO: emitir notif o algo
+        tasksRepository.deleteById(id);
 
         return true;
     }

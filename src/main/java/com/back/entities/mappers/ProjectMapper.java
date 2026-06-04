@@ -100,7 +100,19 @@ public class ProjectMapper {
         }
 
         if (input.getDescription() != null) {
-            project.setDescription(input.getDescription());        }
+            project.setDescription(input.getDescription());
+        }
+        if (input.getStatus() != null) {
+            project.setStatus(input.getStatus());
+        }
+
+        if (input.getStartDate() != null) {
+            project.setStartDate(input.getStartDate());
+        }
+        if (input.getDueDate() != null) {
+            project.setDueDate(input.getDueDate());
+        }
+
 
 
 

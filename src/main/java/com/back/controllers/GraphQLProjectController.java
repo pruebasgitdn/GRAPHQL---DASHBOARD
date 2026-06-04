@@ -52,6 +52,7 @@ public class GraphQLProjectController {
     }
 
 
+    @PreAuthorize("isAuthenticated()")
     @MutationMapping(name = "editProject")
     public ProjectResponse editProject(@Argument EditProjectInput editProjectInput,
                                        @Argument Long projectId
@@ -59,6 +60,8 @@ public class GraphQLProjectController {
         return projectService.editProject(projectId,editProjectInput);
     }
 
+
+    @PreAuthorize("isAuthenticated()")
     @MutationMapping(name = "deleteProject")
     public Boolean deleteProject(@Argument Long projectId
     ) {

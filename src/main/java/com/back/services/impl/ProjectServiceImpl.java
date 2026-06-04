@@ -21,7 +21,9 @@ import com.back.services.UserService;
 import com.back.services.WorkspaceMemberService;
 import com.back.services.WorkspaceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -148,15 +150,31 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectResponse editProject(Long projectId,EditProjectInput editProjectInput) {
-        //Por el momenton no reasigna al espaciodetrabajo => workspaceId no edit sisabe miparcero
+    @Caching(evict = {
+
+            @CacheEvict(value = "project", key = "#id"),
+            //@CacheEvict(value = "workspaces", key = "'all'")
+    })
+    public ProjectResponse editProject(Long id,EditProjectInput editProjectInput) {
 
         //buscar proyecto
-        Project project = projectRepository.findById(projectId)
+        Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException("Proyecto no encontrado"));
 
-        //validar nombre y actualizar
+        if(editProjectInput.getDueDate() != null &&
+                editProjectInput.getStartDate() != null){
+
+            if (editProjectInput.getStartDate().isAfter(editProjectInput.getDueDate())) {
+                throw new RuntimeException("Ingrese un rango de fecha valido");
+            }
+
+        }
+
+
+
         projectMapper.updateProjectFromDto(editProjectInput,project);
+
+
 
         if(editProjectInput.getTaskIds() != null){
             List<Task> tasks = tasksRepository.findAllById(editProjectInput.getTaskIds());
@@ -175,12 +193,18 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Boolean deleteProject(Long projectId) {
+    @CacheEvict(value = "project", key = "#id")
+    public Boolean deleteProject(Long id) {
 
-        projectRepository.deleteById(projectId);
+        projectRepository.deleteById(id);
+
+        //TODO: emitir notificacion o algo
 
         return true;
     }
+
+    //TODO EDITAR NOMBRE Y/O DESCRIP POR SEPARADO ? O JUNTO ?=
+    //MANDARLO tododesde del clieente un solo form mejor
 
 
 }
