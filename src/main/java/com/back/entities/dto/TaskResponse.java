@@ -27,8 +27,6 @@ public class TaskResponse {
 
     private String description;
 
-  //  private Long projectId;
-
     private TaskStatus status;
 
     private TaskPriority priority;

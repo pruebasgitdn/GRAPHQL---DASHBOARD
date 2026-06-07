@@ -42,7 +42,6 @@ public class CreateProjectInput {
     @NotNull(message = "El proyecto debe ir asociado a un espacio de trabajo(workspace)")
     private UUID workspaceId;
 
-
     @NotNull(message = "El proyecto debe ir asociado a un creador")
     private UUID ownerId;
 

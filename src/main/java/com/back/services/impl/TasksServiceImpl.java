@@ -2,6 +2,7 @@ package com.back.services.impl;
 
 import com.back.entities.Project;
 import com.back.entities.Task;
+import com.back.entities.TaskLabel;
 import com.back.entities.User;
 import com.back.entities.dto.CreateTaskInput;
 import com.back.entities.dto.EditTaskInput;
@@ -44,7 +45,7 @@ public class TasksServiceImpl implements TasksService {
     private final TaskLabelService taskLabelService;
 
 
-    @Transactional(readOnly = false)
+    @Transactional
     @Override
     public TaskResponse createTask(CreateTaskInput createTaskInput,UUID owner_id) {
 
@@ -62,6 +63,10 @@ public class TasksServiceImpl implements TasksService {
             throw new ItemNotFoundException("Creador no encontrado");
         });
 
+        //tLbalel
+
+
+
 
         Task taskToSave = Task.builder()
                 .title(createTaskInput.getTitle())
@@ -69,8 +74,8 @@ public class TasksServiceImpl implements TasksService {
                 .project(project)
                 .priority(createTaskInput.getPriority())
                 .status(createTaskInput.getStatus())
-                .actualHours(createTaskInput.getActualHours())
-                .completedAt(createTaskInput.getCompletedAt())
+                //.actualHours(createTaskInput.getActualHours())
+                //.completedAt(createTaskInput.getCompletedAt())
                 .estimatedHours(createTaskInput.getEstimatedHours())
                 .isArchived(false)
                 .dueDate(createTaskInput.getDueDate())
@@ -83,7 +88,8 @@ public class TasksServiceImpl implements TasksService {
         if (createTaskInput.getLabels() != null && !createTaskInput.getLabels().isEmpty()) {
             taskLabelService.createManyTaskLabel(savedTask, createTaskInput.getLabels());
         }
-
+        //sincronizar los cambios realizados en las entidades gestionad
+        //y la previa gestion de la creacion de los label en caso de haberlost
         tasksRepository.flush();
 
         Task fullTask = tasksRepository.findByIdWithLabels(savedTask.getId())

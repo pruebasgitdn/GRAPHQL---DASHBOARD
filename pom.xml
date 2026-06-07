@@ -61,7 +61,7 @@
 
 
 
-		<!-- WebFlux (necesario para subscriptions reactivas) -->
+		<!--  (necesario para subscriptions) -->
 		<dependency>
 			<groupId>com.tailrocks.graphql</groupId>
 			<artifactId>graphql-datetime-spring-boot-starter</artifactId>
@@ -75,7 +75,7 @@
 			<optional>true</optional>
 		</dependency>
 
-		<!-- WebFlux (necesario para subscriptions reactivas) -->
+		<!--  (necesario para subscriptions) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
