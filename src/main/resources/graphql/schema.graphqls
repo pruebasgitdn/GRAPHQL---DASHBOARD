@@ -386,6 +386,9 @@ type Mutation {
 
     sendComment(commentInput:CreateCommentInput): CommentResponse
 
+    deleteComment(id:Int!): Boolean
+
+    editComment(id:Int!, newContent:String!): CommentResponse
 }
 
 

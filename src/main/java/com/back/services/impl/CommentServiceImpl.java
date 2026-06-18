@@ -134,4 +134,48 @@ public class CommentServiceImpl implements CommentService {
 
                 )).toList();
     }
+
+    @Override
+    @Caching(evict = {
+
+            @CacheEvict(value = "comment", key = "#id"),
+            @CacheEvict(value = "commentsByTask", key = "#id")
+    })
+    public CommentResponse editCommentContent(String newContent, Long id) {
+
+
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(()->{
+                    throw  new ItemNotFoundException("Comentario no encontrado");
+                });
+
+        User user = userRepository.findById((comment.getUser().getId()))
+                .orElseThrow(()->{
+                    throw  new ItemNotFoundException("Owner no encontrado");
+
+                });
+        commentMapper.editCommentContentFromEntity(newContent,comment);
+
+        Comment editedComment = commentRepository.save(comment);
+
+        return commentMapper.fromEntityToResponse(editedComment,userMapper.toResponse(user));
+    }
+
+    @Override
+    @Caching(evict = {
+
+            @CacheEvict(value = "comment", key = "#id"),
+            @CacheEvict(value = "commentsByTask", key = "#id")
+    })
+    public Boolean deleteComment(Long id) {
+
+        Comment comment = commentRepository.findById(id)
+                .orElseThrow(()->{
+                    throw  new ItemNotFoundException("Comentario no encontrado");
+                });
+
+        commentRepository.delete(comment);
+
+        return true;
+    }
 }

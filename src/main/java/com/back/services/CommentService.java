@@ -19,6 +19,9 @@ public interface CommentService {
 
     List<CommentResponse> getAllComments();
 
+    CommentResponse editCommentContent(String newContent,Long id);
+
+    Boolean deleteComment(Long id);
 
 
 }

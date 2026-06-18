@@ -36,6 +36,34 @@ public class GraphQLCommentController {
         return commentService.sendComment(commentInput,authenticated.getId());
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @MutationMapping(name = "deleteComment")
+    public Boolean deleteComment(@Argument(name = "id") Long id,
+                                       @AuthenticationPrincipal UserDetailsImpl authenticated
+
+    ){
+        if(authenticated == null){
+            throw new AuthenticationCredentialsNotFoundException("No se econtraron las credenciales de autenticacion");
+        }
+
+        return commentService.deleteComment(id);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @MutationMapping(name = "editComment")
+    public CommentResponse editComment(@Argument(name = "id") Long id,
+                                       @Argument(name = "newContent") String newContent,
+                                 @AuthenticationPrincipal UserDetailsImpl authenticated
+
+    ){
+        if(authenticated == null){
+            throw new AuthenticationCredentialsNotFoundException("No se econtraron las credenciales de autenticacion");
+        }
+
+        return commentService.editCommentContent(newContent,id);
+    }
+
+
 
     @QueryMapping(name = "getCommentById")
     public CommentResponse getCommentById(@Argument(name = "id") Long id

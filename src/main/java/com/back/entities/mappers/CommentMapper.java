@@ -29,6 +29,15 @@ public class CommentMapper {
                 .build();
     }
 
+    public void editCommentContentFromEntity(String newContent,
+                                             Comment comment
+                                             ){
+        if(newContent != null){
+            comment.setContent(newContent);
+        }
+
+    }
+
     public CommentResponse fromEntityToResponse(Comment comment,
                                         UserResponse user
                                         //,TaskResponse task

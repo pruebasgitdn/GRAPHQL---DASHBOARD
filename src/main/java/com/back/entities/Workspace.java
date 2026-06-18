@@ -44,15 +44,12 @@ public class Workspace {
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Project> projects = new ArrayList<>();
 
-
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
 
 }

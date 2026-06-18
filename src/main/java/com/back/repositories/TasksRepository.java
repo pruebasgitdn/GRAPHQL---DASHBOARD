@@ -21,9 +21,6 @@ public interface TasksRepository extends JpaRepository<Task,Long> {
     @Override
     Optional<Task> findById(Long id);
 
-//    List<Task> findAllById(Long id);
-//    boolean existsByTitle(String title);
-
     boolean existsByTitleAndProjectId(String title, Long projectId);
 
     List<Task> findAllByProjectId(Long projectId);
@@ -54,7 +51,6 @@ public interface TasksRepository extends JpaRepository<Task,Long> {
     """)
     int updateTitleById(Long id, String title);
 
-
     @Modifying
     @Transactional
     @Query("""
@@ -63,7 +59,6 @@ public interface TasksRepository extends JpaRepository<Task,Long> {
     WHERE k.id = :id
     """)
     int updateDescriptionById(Long id, String description);
-
 
     @Modifying
     @Transactional
@@ -74,7 +69,6 @@ public interface TasksRepository extends JpaRepository<Task,Long> {
     """)
     int updatePriorityById(Long id, TaskPriority priority);
 
-
     @Modifying
     @Transactional
     @Query("""
@@ -83,7 +77,5 @@ public interface TasksRepository extends JpaRepository<Task,Long> {
     WHERE k.id = :id
     """)
     int updateStatusById(Long id, TaskStatus status);
-
-
 
 }
