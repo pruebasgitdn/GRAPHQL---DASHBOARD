@@ -11,19 +11,13 @@ import com.back.entities.mappers.TasksMapper;
 import com.back.entities.mappers.UserMapper;
 import com.back.enums.NotificationType;
 import com.back.exceptions.ItemNotFoundException;
-import com.back.repositories.NotificationRepository;
-import com.back.repositories.TaskAssigneeRepository;
-import com.back.repositories.TasksRepository;
-import com.back.repositories.UserRepository;
+import com.back.repositories.*;
 import com.back.services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
+import java.util.*;
 
 
 @Service
@@ -42,7 +36,7 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
     private final UserMapper userMapper;
     private final NotificationPublisherService notificationPublisher;
     private final NotificationMapper notificationMapper;
-
+    private final WorkspaceMemberRepository workspaceMemberRepository;
 
     @Override
     @Transactional
@@ -128,6 +122,84 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
                 .build();
 
         return taskAssigneeResponse;
+    }
+
+    @Transactional
+    @Override
+    public List<TaskAssigneeResponse> createMultipleAssignations(Long taskId, List<UUID> userIds, UUID currentUser,UUID workspaceId) {
+        //TaskResponse taskResponse = tasksService.getTask(taskId);
+        Task taskEntity = tasksRepository.findById(taskId)
+                .orElseThrow(() -> new ItemNotFoundException("Tarea no encontrada"));
+
+        if(taskEntity == null){
+            throw new ItemNotFoundException("Tarea no encontrada");
+        }
+
+        if(userIds.isEmpty()){
+            throw new IllegalArgumentException("Ingrese el o los ids de los usuarios a asignar");
+        }
+        if (!workspaceMemberService.isMember(workspaceId,currentUser)) {
+            throw new RuntimeException("No eres miembro del espacio para asignar una tarea");
+        }
+
+
+        Set<UUID> workspaceMembersSet = new HashSet<>(workspaceMemberRepository.findUserIdsByWorkspaceId(workspaceId));
+        Set<UUID> uniqueUserIds = new HashSet<>(userIds);
+
+        if(!workspaceMembersSet.containsAll(uniqueUserIds)){
+            throw new RuntimeException("Uno o más usuarios no pertenecen al workspace");
+        }
+
+        //Task taskEntity = tasksMapper.toEntity(taskResponse);
+
+        Set<UUID> alreadyAssigned =
+                taskAssigneeRepository.findAssignedUserIdsByTaskId(taskId);
+        uniqueUserIds.removeAll(alreadyAssigned);
+
+        if(uniqueUserIds.isEmpty()){
+            return List.of();
+        }
+
+        List<User> usersToAssign = userRepository.findAllById(uniqueUserIds);
+        if(usersToAssign.size() != uniqueUserIds.size()){
+            throw new ItemNotFoundException("Uno o más usuarios no existen");
+        }
+
+        List<TaskAssignee> assignees = usersToAssign.stream()
+                .map(user -> TaskAssignee.builder()
+                        .task(taskEntity)
+                        .user(user)
+                        .build())
+                .toList();
+
+        List<Notification>  notifications = usersToAssign.stream()
+                        .map((n) -> Notification.builder()
+                                .user(n)
+                                .title("Tienes una nueva tarea asignada")
+                                .message("Se te ha asignado una nueva tarea")
+                                .type(NotificationType.ASSIGN)
+                                .build())
+                                .toList();
+
+        notifications.forEach(nt ->
+                notificationPublisher.publish(
+                        nt.getUser().getId().toString(),
+                        notificationMapper.toResponse(nt)
+                )
+        );
+
+        List<TaskAssigneeResponse> assigneeResponses = assignees.stream()
+                        .map((p)->{
+                         return TaskAssigneeResponse.builder()
+                                 .user(userMapper.toResponse(p.getUser()))
+                                 .task(tasksMapper.toResponse(p.getTask()))
+                                  .build();
+                        }).toList();
+
+        notificationRepository.saveAll(notifications);
+        taskAssigneeRepository.saveAll(assignees);
+
+        return assigneeResponses;
     }
 
     @Transactional(readOnly = true)

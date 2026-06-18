@@ -11,4 +11,6 @@ public interface SubTaskService {
 
     List<SubTaskResponse> getSubTasksByTaskId(Long taskId);
 
+    List<SubTaskResponse> getAllSubTasks();
+
 }

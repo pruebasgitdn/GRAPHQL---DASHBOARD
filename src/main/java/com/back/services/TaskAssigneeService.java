@@ -11,6 +11,8 @@ public interface TaskAssigneeService {
 
     TaskAssigneeResponse createAssignation(Long taskId, UUID user_assign, UUID currentUser,UUID workspaceId);
 
+    List<TaskAssigneeResponse> createMultipleAssignations(Long taskId, List<UUID> userIds, UUID currentUser,UUID workspaceId);
+
     List<TaskAssigneeResponse> assignationsByUserId(UUID owner);
 
     List<TaskAssigneeResponse> assignationsByTaskId(Long taskId);

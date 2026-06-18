@@ -9,6 +9,8 @@ import com.back.entities.dto.EditTaskInput;
 import com.back.entities.dto.TaskResponse;
 import com.back.entities.mappers.ProjectMapper;
 import com.back.entities.mappers.TasksMapper;
+import com.back.enums.TaskPriority;
+import com.back.enums.TaskStatus;
 import com.back.exceptions.AlreadyExistException;
 import com.back.exceptions.ItemNotFoundException;
 import com.back.exceptions.UserNotFoundException;
@@ -175,6 +177,94 @@ public class TasksServiceImpl implements TasksService {
 
         //TODO: emitir notif o algo
         tasksRepository.deleteById(id);
+
+        return true;
+    }
+
+    @Override
+    @Caching(evict = {
+            @CacheEvict(value = "task", key = "#id")}
+    )
+    public Boolean editTaskTitle(String newTitle, Long id) {
+
+        if (newTitle == null || newTitle.length() > 70) {
+            throw new IllegalArgumentException("El titulo no puede superar los 70 caracteres");
+        }
+
+       int updated =  tasksRepository.updateTitleById(id,newTitle);
+
+        if(updated == 0){
+            throw new ItemNotFoundException("Tarea no encontrada");
+        }
+
+        return true;
+    }
+
+    @Override
+    @Caching(evict = {
+            @CacheEvict(value = "task", key = "#id")}
+    )
+    public Boolean editTaskDescription(String newDescription, Long id) {
+
+        if (newDescription == null || newDescription.length() > 200) {
+            throw new IllegalArgumentException("La descripción no puede superar los 200 caracteres");
+        }
+
+        int updated =  tasksRepository.updateDescriptionById(id,newDescription);
+
+        if(updated == 0){
+            throw new ItemNotFoundException("Tarea no encontrada");
+        }
+
+        return true;
+
+    }
+
+    @Override
+    @Caching(evict = {
+            @CacheEvict(value = "task", key = "#id")}
+    )
+    public Boolean editTaskStatus(TaskStatus status,Long id) {
+
+        if (status == null ) {
+            throw new IllegalArgumentException("El estado es obligatorio");
+        }
+
+        Task task = tasksRepository.findById(id).orElseThrow(()->{
+            throw  new ItemNotFoundException("Tarea no encontrada");
+        });
+
+        int updated =  tasksRepository.updateStatusById(task.getId(),status);
+
+        if(updated == 0){
+            throw new ItemNotFoundException("Tarea no encontrada");
+        }
+
+        return true;
+
+
+    }
+
+    @Override
+    @Caching(evict = {
+            @CacheEvict(value = "task", key = "#id")}
+    )
+    public Boolean editTaskPriority(TaskPriority priority,Long id) {
+
+        if (priority == null ) {
+            throw new IllegalArgumentException("La prioridad es obligatoria");
+        }
+
+        Task task = tasksRepository.findById(id).orElseThrow(()->{
+            throw  new ItemNotFoundException("Tarea no encontrada");
+        });
+
+
+        int updated =  tasksRepository.updatePriorityById(task.getId(),priority);
+
+        if(updated == 0){
+            throw new ItemNotFoundException("Tarea no encontrada");
+        }
 
         return true;
     }

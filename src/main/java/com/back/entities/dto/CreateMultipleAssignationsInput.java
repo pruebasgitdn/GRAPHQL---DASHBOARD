@@ -7,24 +7,24 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateTaskAssigneeInput {
+public class CreateMultipleAssignationsInput {
+
 
     @NotNull(message = "Llena el id de la tarea a asignar")
     private long taskId;
 
-    @NotNull(message = "Llena el id del usuario a asignar")
-    private UUID userId;
+    @NotNull(message = "Llena los id de los usuarios a asignar")
+    private List<UUID> userIds;
 
     @NotNull(message = "Ingresalo, para saber si es miembro de ese espacio")
     private UUID workspaceId;
-
-
 
 
 }

@@ -36,6 +36,12 @@ public class RedisConfig {
 
             ObjectMapper redisMapper = objectMapper.copy();
 
+
+            //serializer con config de fechas
+            //ObjectMapper mapper = new ObjectMapper();
+            redisMapper.registerModule(new JavaTimeModule());
+            redisMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
             redisMapper.activateDefaultTyping(
                     BasicPolymorphicTypeValidator.builder()
                             .allowIfSubType(Object.class)
@@ -44,10 +50,6 @@ public class RedisConfig {
                     JsonTypeInfo.As.PROPERTY
             );
 
-            //serializer con config de fechas
-//            ObjectMapper mapper = new ObjectMapper();
-//            mapper.registerModule(new JavaTimeModule());
-//            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
             GenericJackson2JsonRedisSerializer serializer =
                     new GenericJackson2JsonRedisSerializer(redisMapper);
 

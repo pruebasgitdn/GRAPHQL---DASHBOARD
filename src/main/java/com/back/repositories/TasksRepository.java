@@ -3,8 +3,12 @@ package com.back.repositories;
 import com.back.entities.Project;
 import com.back.entities.SubTask;
 import com.back.entities.Task;
+import com.back.enums.TaskPriority;
+import com.back.enums.TaskStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,5 +45,45 @@ public interface TasksRepository extends JpaRepository<Task,Long> {
     Optional<Task> findByIdWithLabels(Long id);
 
 
-    void deleteByProjectId(Long projectId);
+    @Modifying
+    @Transactional
+    @Query("""
+    UPDATE Task k
+    SET k.title = :title
+    WHERE k.id = :id
+    """)
+    int updateTitleById(Long id, String title);
+
+
+    @Modifying
+    @Transactional
+    @Query("""
+    UPDATE Task k
+    SET k.description = :description
+    WHERE k.id = :id
+    """)
+    int updateDescriptionById(Long id, String description);
+
+
+    @Modifying
+    @Transactional
+    @Query("""
+    UPDATE Task k
+    SET k.priority = :priority
+    WHERE k.id = :id
+    """)
+    int updatePriorityById(Long id, TaskPriority priority);
+
+
+    @Modifying
+    @Transactional
+    @Query("""
+    UPDATE Task k
+    SET k.status = :status
+    WHERE k.id = :id
+    """)
+    int updateStatusById(Long id, TaskStatus status);
+
+
+
 }

@@ -3,6 +3,8 @@ package com.back.controllers;
 
 import com.back.dataloader.SubTaskDataLoader;
 import com.back.entities.dto.*;
+import com.back.enums.TaskPriority;
+import com.back.enums.TaskStatus;
 import com.back.security.UserDetailsImpl;
 import com.back.services.SubTaskService;
 import com.back.services.TasksService;
@@ -42,6 +44,42 @@ public class GraphQLTasksController {
 
         return tasksService.createTask(createTaskInput,authenticated.getId());
     }
+
+    @MutationMapping(name = "editTaskTitle")
+    public Boolean editTaskTitle(
+            @Argument(name = "id") Long id,
+            @Argument(name = "newTitle") String newTitle
+    ){
+
+        return tasksService.editTaskTitle(newTitle,id);
+    }
+
+    @MutationMapping(name = "editTaskDescription")
+    public Boolean editTaskDescription(
+            @Argument(name = "id") Long id,
+            @Argument(name = "newDescription") String newDescription
+    ){
+        return tasksService.editTaskDescription(newDescription,id);
+    }
+
+    @MutationMapping(name = "editTaskStatus")
+    public Boolean editTaskStatus(
+            @Argument(name = "id") Long id,
+            @Argument(name = "newStatus") TaskStatus newStatus
+    ){
+        return tasksService.editTaskStatus(newStatus,id);
+    }
+
+    @MutationMapping(name = "editTaskPriority")
+    public Boolean editTaskPriority(
+            @Argument(name = "id") Long id,
+            @Argument(name = "newPriority") TaskPriority newPriority
+    ){
+        return tasksService.editTaskPriority(newPriority,id);
+    }
+
+
+
 
     // Tareas
 

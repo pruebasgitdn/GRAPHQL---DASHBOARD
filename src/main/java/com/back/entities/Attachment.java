@@ -32,7 +32,7 @@ public class Attachment {
     private String fileUrl;
 
     @Column(name = "file_size")
-    private Integer fileSize;
+    private Long fileSize;
 
     @Column(name = "mime_type")
     private String mimeType;

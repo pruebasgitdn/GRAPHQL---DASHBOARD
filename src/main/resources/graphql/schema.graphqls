@@ -204,6 +204,12 @@ input CreateProjectInput {
     taskIds: [ID]
 }
 
+input CreateMultipleAssignationsInput {
+    taskId: Int!
+    userIds: [ID]!
+    workspaceId: ID!
+}
+
 type NotificationResponse {
     id: Int
     title: String
@@ -256,6 +262,20 @@ type MemberRoleResponse {
     role: Role
 }
 
+input CreateCommentInput{
+    taskId: Int!
+    content: String!
+}
+
+
+type CommentResponse {
+    id: Int
+    content: String
+    createdAt: LocalDateTime
+    user:User
+}
+
+
 type Query {
     userList: [User]
 
@@ -303,6 +323,15 @@ type Query {
 
     leaveGroup(workspaceId:ID!): Boolean
 
+    getCommentById(id:Int!):CommentResponse
+
+    getCommentsByTaskId(taskId:Int!): [CommentResponse]
+
+    getAllComments: [CommentResponse]
+
+    getSubTasksByTaskId(taskId:Int!): [SubTaskResponse]
+
+    getAllSubTasks: [SubTaskResponse]
 }
 
 type Mutation {
@@ -344,6 +373,19 @@ type Mutation {
     confirmInvitation(token:String!):String
 
     editWorkspace(workspaceInput:EditWorkspaceInput,workspaceId:ID):WorkspaceResponse
+
+    editTaskTitle(id:Int!,newTitle:String!):Boolean
+
+    editTaskDescription(id:Int!,newDescription:String!):Boolean
+
+    editTaskStatus(id:Int!,newStatus:TaskStatus!):Boolean
+
+    editTaskPriority(id:Int!,newPriority:TaskPriority!):Boolean
+
+    createMultipleAssignations(taskAssigneeInput:CreateMultipleAssignationsInput):[TaskAssigneeResponse]
+
+    sendComment(commentInput:CreateCommentInput): CommentResponse
+
 }
 
 

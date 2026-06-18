@@ -43,6 +43,23 @@ public class GrapQLTaskAssigneeController {
 
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @MutationMapping(name = "createMultipleAssignations")
+    public List<TaskAssigneeResponse> createMultipleAssignations(@Valid @Argument CreateMultipleAssignationsInput taskAssigneeInput,
+                                                                 @AuthenticationPrincipal UserDetailsImpl authenticated) {
+
+        if(authenticated == null){
+            throw new AuthenticationCredentialsNotFoundException("No se econtraron las credenciales de autenticacion");
+        }
+
+        UUID user_id = authenticated.getId();
+
+         return taskAssigneeService.createMultipleAssignations(taskAssigneeInput.getTaskId()
+                 ,taskAssigneeInput.getUserIds()
+                 ,user_id
+                 ,taskAssigneeInput.getWorkspaceId());
+    }
+
     // Obtener todas las asignaciones
     @QueryMapping(name = "allAssignations")
     public List<TaskAssigneeResponse> allAssignations() {

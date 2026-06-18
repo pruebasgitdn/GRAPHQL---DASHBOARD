@@ -56,11 +56,30 @@ public class SubTaskServiceImpl implements SubTaskService {
 
     @Override
     public List<SubTaskResponse> getSubTasksByTaskId(Long taskId) {
-        List<SubTask> subTasks = subTaskRepository.findAllByTaskId(taskId);
+        List<SubTask> subTasks = subTaskRepository.findByTaskId(taskId);
+
+        if(subTasks.isEmpty()){
+            throw new ItemNotFoundException("No se encontraron subtareas asociadas por el momento");
+        }
 
         return subTasks.stream().map((
                 mp-> subTaskMapper.toResponse(mp)
                 )).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SubTaskResponse> getAllSubTasks() {
+
+        List<SubTask> subTasks = subTaskRepository.findAll();
+
+        if(subTasks.isEmpty()){
+            throw new ItemNotFoundException("No hay subtareas por el momento");
+        }
+
+        return subTasks.stream()
+                .map(p->
+                    subTaskMapper.toResponse(p)
+                ).toList();
     }
 
 }
