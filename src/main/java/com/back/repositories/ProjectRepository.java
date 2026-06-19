@@ -2,7 +2,10 @@ package com.back.repositories;
 
 import com.back.entities.Project;
 import com.back.entities.Task;
+import com.back.enums.ProjectStatus;
+import com.back.enums.TaskPriority;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,6 +31,28 @@ public interface ProjectRepository extends JpaRepository<Project,Long> {
     //El collection es una estructura de datos q me permite
     //Agrupar multiples elementos en una unidad
     List<Project> findAllByWorkspaceIdIn(Collection<UUID> workspaceId);
+
+
+    @Query("""
+            SELECT t.status, COUNT(t)
+            FROM Project t
+            WHERE t.workspace.id = :workspaceId
+            GROUP BY t.status
+            """)
+    List<Object[]> getProjectStatusDistribution(
+            UUID workspaceId
+    );
+
+    @Query("""
+            SELECT COUNT(t)
+            FROM Project t
+            WHERE t.workspace.id = :workspaceId
+            AND t.status = :status
+            """)
+    Long countByWorkspaceIdAndStatus(
+            UUID workspaceId,
+            ProjectStatus status
+    );
 
 
 }

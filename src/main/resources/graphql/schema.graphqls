@@ -17,6 +17,35 @@ enum TaskLabelType {
 
 }
 
+enum ActivityAction{
+    created_task,
+    updated_task,
+    created_subtask,
+    updated_subtask,
+    completed_task,
+    created_project,
+    updated_project,
+    completed_project,
+    created_workspace,
+    updated_workspace,
+    added_comment,
+    added_member,
+    removed_member,
+    joined_workspace,
+    transferred_workspace_ownership,
+    added_attachment,
+}
+
+
+
+enum ActivityResourceType {
+Task,
+Project,
+Comment,
+Attachment,
+User
+}
+
 enum Role {
     OWNER,ADMIN,MEMBER,GUEST
 }
@@ -45,6 +74,38 @@ type Workspace {
 
 }
 
+type DashboardResponse{
+
+    totalProjects: Int
+    totalProjectInProgress: Int
+    taskStats: TaskStats
+
+    tasksStatusDistribution: [TaskStatusDistributionResponse]
+    tasksPriorityDistribution: [TaskPriorityDistributionResponse]
+
+
+
+
+}
+
+type TaskPriorityDistributionResponse{
+    priority:TaskStatus
+    count: Int
+}
+
+type TaskStatusDistributionResponse{
+    status: TaskPriority
+    count: Int
+}
+
+
+type TaskStats{
+    totalTasks: Int
+    todoTasks: Int
+    inProgressTasks: Int
+    doneTasks: Int
+
+}
 type TaskResponse {
     id: Int
     title: String
@@ -332,6 +393,8 @@ type Query {
     getSubTasksByTaskId(taskId:Int!): [SubTaskResponse]
 
     getAllSubTasks: [SubTaskResponse]
+
+    dashboardWorkspace(workspaceId: ID!): DashboardResponse
 }
 
 type Mutation {

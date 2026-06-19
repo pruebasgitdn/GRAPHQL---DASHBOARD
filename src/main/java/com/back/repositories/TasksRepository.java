@@ -3,6 +3,8 @@ package com.back.repositories;
 import com.back.entities.Project;
 import com.back.entities.SubTask;
 import com.back.entities.Task;
+import com.back.entities.dto.TaskStats;
+import com.back.entities.dto.TaskStatsProjection;
 import com.back.enums.TaskPriority;
 import com.back.enums.TaskStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -77,5 +79,60 @@ public interface TasksRepository extends JpaRepository<Task,Long> {
     WHERE k.id = :id
     """)
     int updateStatusById(Long id, TaskStatus status);
+
+    @Query("""
+            SELECT t.status, COUNT(t)
+            FROM Task t
+            WHERE t.project.workspace.id = :workspaceId
+            GROUP BY t.status
+            """)
+    List<Object[]> getTaskPriorityDistribution(
+            UUID workspaceId
+    );
+
+    @Query("""
+            SELECT t.priority, COUNT(t)
+            FROM Task t
+            WHERE t.project.workspace.id = :workspaceId
+            GROUP BY t.priority
+            """)
+    List<Object[]> getTaskStatusDistribution(
+            UUID workspaceId
+    );
+
+    @Query("""
+            SELECT COUNT(t)
+            FROM Task t
+            WHERE t.project.workspace.id = :workspaceId
+            """)
+    Long countByWorkspaceId(UUID workspaceId);
+
+
+    @Query("""
+            SELECT COUNT(t)
+            FROM Task t
+            WHERE t.project.workspace.id = :workspaceId
+            AND t.priority = :priority
+            """)
+    Long countByWorkspaceIdAndPriority(
+            UUID workspaceId,
+            TaskPriority priority
+    );
+
+    @Query("""
+                SELECT
+                    COUNT(t) as totalTasks,
+                 COALESCE(SUM(CASE WHEN t.priority = :todo THEN 1 ELSE 0 END), 0) as todoTasks,
+                 COALESCE(SUM(CASE WHEN t.priority = :inProgress THEN 1 ELSE 0 END), 0) as inProgressTasks,
+                 COALESCE(SUM(CASE WHEN t.priority = :done THEN 1 ELSE 0 END), 0) as doneTasks
+                FROM Task t
+                WHERE t.project.workspace.id = :workspaceId
+            """)
+    TaskStatsProjection getTaskStats(
+            UUID workspaceId,
+            TaskPriority todo,
+            TaskPriority inProgress,
+            TaskPriority done
+    );
 
 }
