@@ -19,7 +19,7 @@ public interface CommentService {
 
     List<CommentResponse> getAllComments();
 
-    CommentResponse editCommentContent(String newContent,Long id);
+    CommentResponse editCommentContent(String newContent,Long id, UUID userId);
 
     Boolean deleteComment(Long id);
 

@@ -17,12 +17,14 @@ import com.back.repositories.TasksRepository;
 import com.back.repositories.UserRepository;
 import com.back.services.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -37,14 +39,9 @@ public class CommentServiceImpl implements CommentService {
     private final TasksMapper tasksMapper;
     private final CommentRepository commentRepository;
     private  final CommentMapper commentMapper;
+    private final CacheManager cacheManager;
 
-
-    @Override
-    @Caching(evict = {
-
-            @CacheEvict(value = "comment", key = "#commentInput.taskId"),
-            @CacheEvict(value = "commentsByTask", key = "#commentInput.taskId")
-    })
+       @Override
     public CommentResponse sendComment(CreateCommentInput commentInput, UUID userId) {
 
         User user = userRepository.findById(userId).
@@ -67,6 +64,9 @@ public class CommentServiceImpl implements CommentService {
                 .build();
 
         commentRepository.save(comment);
+
+        cacheManager.getCache("commentsByTask")
+                .evict(task.getId());
 
         return commentMapper.fromEntityToResponse(comment,userResponse);
     }
@@ -136,37 +136,45 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    @Caching(evict = {
+public CommentResponse editCommentContent(String newContent, Long id,UUID userId) {
 
-            @CacheEvict(value = "comment", key = "#id"),
-            @CacheEvict(value = "commentsByTask", key = "#id")
-    })
-    public CommentResponse editCommentContent(String newContent, Long id) {
-
+        if (newContent != null && newContent.length() > 300) {
+            throw new IllegalArgumentException("El comentario no puede superar los 300 caracteres");
+        }
 
         Comment comment = commentRepository.findById(id)
                 .orElseThrow(()->{
                     throw  new ItemNotFoundException("Comentario no encontrado");
                 });
 
+
         User user = userRepository.findById((comment.getUser().getId()))
                 .orElseThrow(()->{
                     throw  new ItemNotFoundException("Owner no encontrado");
 
                 });
+        if (!user.getId().equals(userId)){
+            throw new IllegalArgumentException("No tienes permiso para ejecutar esta accion, no eres dueño del comentario");
+        }
         commentMapper.editCommentContentFromEntity(newContent,comment);
 
+        comment.setCreatedAt(LocalDateTime.now());
         Comment editedComment = commentRepository.save(comment);
+
+        Long taskId = editedComment.getTask().getId();
+        cacheManager.getCache("comment").evict(id);
+        cacheManager.getCache("commentsByTask")
+                .evict(taskId);
 
         return commentMapper.fromEntityToResponse(editedComment,userMapper.toResponse(user));
     }
 
     @Override
-    @Caching(evict = {
-
-            @CacheEvict(value = "comment", key = "#id"),
-            @CacheEvict(value = "commentsByTask", key = "#id")
-    })
+//    @Caching(evict = {
+//
+//            @CacheEvict(value = "comment", key = "#id"),
+//            @CacheEvict(value = "commentsByTask", allEntries = true)
+//    })
     public Boolean deleteComment(Long id) {
 
         Comment comment = commentRepository.findById(id)
@@ -174,7 +182,15 @@ public class CommentServiceImpl implements CommentService {
                     throw  new ItemNotFoundException("Comentario no encontrado");
                 });
 
+
+
         commentRepository.delete(comment);
+
+        Long taskId = comment.getTask().getId();
+
+        cacheManager.getCache("comment").evict(id);
+        cacheManager.getCache("commentsByTask")
+                .evict(taskId);
 
         return true;
     }

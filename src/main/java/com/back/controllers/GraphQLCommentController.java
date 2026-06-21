@@ -60,7 +60,7 @@ public class GraphQLCommentController {
             throw new AuthenticationCredentialsNotFoundException("No se econtraron las credenciales de autenticacion");
         }
 
-        return commentService.editCommentContent(newContent,id);
+        return commentService.editCommentContent(newContent,id,authenticated.getId());
     }
 
 
