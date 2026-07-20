@@ -22,6 +22,7 @@ test:
   #guarda los archivos generados por un job para descargar o compartir
   artifacts:
     when: always #consevarlos aunque falle/n
+
     reports: #artifact como reporte
       junit:  # en formatio junit
         - target/surefire-reports/*.xml
