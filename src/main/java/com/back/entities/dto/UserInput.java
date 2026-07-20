@@ -21,7 +21,7 @@ public class UserInput {
     private String email;
 
     @NotNull(message = "La contraseña no puede ser nula")
-    @Size(min = 5,max = 10,message = "La contraseña debe tener minimo 3 y máximo 10 caracteres" )
+    @Size(min = 5,max = 10,message = "La contraseña debe tener minimo 5 y máximo 10 caracteres" )
     private String password;
 
     @NotNull(message = "Contraseña de confirmacion vacia")

@@ -4,6 +4,7 @@ import com.back.entities.User;
 import com.back.entities.dto.UserInput;
 import com.back.entities.dto.UserResponse;
 import com.back.entities.mappers.UserMapper;
+import com.back.exceptions.AlreadyExistException;
 import com.back.exceptions.ItemNotFoundException;
 import com.back.repositories.UserRepository;
 import com.back.services.UserService;
@@ -32,11 +33,12 @@ public class UserServiceImpl implements UserService {
     public UserResponse registerUser(UserInput user) {
 
         //Encontrar por email
-         Optional<User> userExist = userRepository.findByEmail(user.getEmail());
-
-         if(userExist.isPresent()){
-             throw new RuntimeException("El email: "+userExist.get().getEmail()+" ya esta en uso.");
-         }
+        userRepository.findByEmail(user.getEmail())
+                .ifPresent(existingUser -> {
+                    throw new AlreadyExistException(
+                            "El email: " + existingUser.getEmail() + " ya esta en uso."
+                    );
+                });
 
          if(!user.getPassword().equals(user.getRepeatPassword())){
              throw new RuntimeException("Las contraseñas no coinciden");

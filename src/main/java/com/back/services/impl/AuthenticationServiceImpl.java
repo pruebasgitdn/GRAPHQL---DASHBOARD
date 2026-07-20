@@ -59,10 +59,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     new UsernamePasswordAuthenticationToken(email, password)
             ));
         } catch (BadCredentialsException ex) {
-            //throw new RuntimeException("Credenciales Incorrectas");
             throw new InvalidCredentialsException();
         } catch (UsernameNotFoundException ex) {
-            //throw new RuntimeException("Usuario no encontrado");
             throw new UserNotFoundException();
         }
 
@@ -74,8 +72,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
 
-        UserResponse userResponse = userService.findById(user.getId());
-        User  userEntity = userMapper.FromResponseToEntity(userResponse);
+        //UserResponse userResponse = userService.findById(user.getId());
+        //User  userEntity = userMapper.FromResponseToEntity(userResponse);
         //Conexion subscripcion sink
         //notificationPublisher.subscribe(userEntity.getId().toString());
 
@@ -169,6 +167,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public boolean isRefreshToken(String token) {
+
+        //Extraemos el claim type, devuelve result de la comparacion
         return "refresh".equals(extractClaimsAllowExpired(token).get("type"));
     }
 
