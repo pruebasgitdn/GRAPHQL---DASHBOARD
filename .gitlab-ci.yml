@@ -1,0 +1,28 @@
+image: maven:3.9.9-eclipse-temurin-21
+
+
+# Etapas del pipeline
+stages:
+  - test
+
+cache:
+  #Almacenar ruta del repo de las dependencias de maven
+  #local para no descargarlas en cada mvn test, esto mejora la ejecucion
+  paths:
+    - .m2/repository
+
+
+# Nombre del job es libre
+test:
+  stage: test # A que etapa pertenece ese job, en cual ejecutar
+  script: # Comandos de consola en este caso.. el Script de ejecucion
+    - mvn test
+
+
+  #guarda los archivos generados por un job para descargar o compartir
+  artifacts:
+    when: always #consevarlos aunque falle/n
+    reports: #artifact como reporte
+      junit:  # en formatio junit
+        - target/surefire-reports/*.xml
+         #Ruta donde mvn genera los reportes xml de los tests
