@@ -12,6 +12,7 @@ import com.back.entities.mappers.WorkspaceMemberMapper;
 import com.back.enums.Role;
 import com.back.exceptions.AlreadyExistException;
 import com.back.exceptions.ItemNotFoundException;
+import com.back.exceptions.UserNotFoundException;
 import com.back.repositories.NotificationRepository;
 import com.back.repositories.UserRepository;
 import com.back.repositories.WorkspaceRepository;
@@ -189,8 +190,8 @@ public class WorkspaceServiceUnitTest {
         when(userRepository.findById(ownerId))
                 .thenReturn(Optional.empty());
 
-        ItemNotFoundException exception = assertThrows(
-                ItemNotFoundException.class,
+        UserNotFoundException exception = assertThrows(
+                UserNotFoundException.class,
                 () -> workspaceService.createWorkspace(input,ownerId)
         );
 
