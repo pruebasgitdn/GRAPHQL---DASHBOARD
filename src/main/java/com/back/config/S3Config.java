@@ -1,6 +1,7 @@
 package com.back.config;
 
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ public class S3Config {
     private String awsBucket;
 
     @Bean
+    @ConditionalOnProperty(name = "aws.access-key")
     public S3Client s3Client() {
 
         AwsBasicCredentials awsBasicCredentials = AwsBasicCredentials
