@@ -5,6 +5,22 @@ image: maven:3.9.9-eclipse-temurin-21
 stages:
   - test
 
+
+services:
+  - name: postgres:14-alpine
+    alias: postgres
+
+
+variables:
+  POSTGRES_DB: tasksync
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: daniloospina7
+
+  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tasksync
+  SPRING_DATASOURCE_USERNAME: postgres
+  SPRING_DATASOURCE_PASSWORD: daniloospina7
+
+
 cache:
   #Almacenar ruta del repo de las dependencias de maven
   #local para no descargarlas en cada mvn test, esto mejora la ejecucion
