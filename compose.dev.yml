@@ -4,6 +4,10 @@ services:
     #imagen de maven java q tiene la V de maven y la V de java
     #que es en ese entorno q corre la api si sabe
     image: maven:3.9.9-eclipse-temurin-21
+
+    env_file: #inyectar las variables env a docker
+      - .env
+
     container_name: spring-backend-dev
     working_dir: /back # carpeta del proyecto
 

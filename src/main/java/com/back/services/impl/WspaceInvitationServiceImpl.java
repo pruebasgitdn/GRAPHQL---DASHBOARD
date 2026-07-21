@@ -122,7 +122,7 @@ public class WspaceInvitationServiceImpl implements WspaceInvitationService {
                         "Invitacion no encontrada"));
 
 
-        if(workspaceInvitation.getStatus() != InvitationStatus.PENDING){
+        if(workspaceInvitation.getStatus() != InvitationStatus.PENDING){ //aceptada o expírada
             throw new AlreadyExistException("Esta invitacion ya fue usada");
         }
 
