@@ -12,35 +12,28 @@ import software.amazon.awssdk.services.s3.S3Client;
 @Configuration
 public class S3Config {
 
-//    @Value("${aws.access-key}")
-//    private String accessKey;
-//
-//    @Value("${aws.secret-key}")
-//    private String secretKey;
-//
-//    @Value("${aws.region}")
-//    private String awsRegion;
-//
-//    @Value("${aws.s3.bucket}")
-//    private String awsBucket;
+    @Value("${aws.access-key}")
+    private String accessKey;
+
+    @Value("${aws.secret-key}")
+    private String secretKey;
+
+    @Value("${aws.region}")
+    private String awsRegion;
+
+    @Value("${aws.s3.bucket}")
+    private String awsBucket;
 
     @Bean
     public S3Client s3Client() {
 
-//        AwsBasicCredentials awsBasicCredentials = AwsBasicCredentials
-//                .create(accessKey,secretKey);
-//
-//        return S3Client.builder()
-//                .region(Region.of(awsRegion))
-//                .credentialsProvider(StaticCredentialsProvider.create(awsBasicCredentials))
-//                .build();
-
         AwsBasicCredentials awsBasicCredentials = AwsBasicCredentials
-                .create(EnvConfig.get("aws_access_key"),EnvConfig.get("aws_secret_key"));
+                .create(accessKey,secretKey);
 
         return S3Client.builder()
-                .region(Region.of(EnvConfig.get("aws_region")))
-                .credentialsProvider(StaticCredentialsProvider.create(awsBasicCredentials))
+                .region(Region.of(awsRegion))
+                .credentialsProvider(
+                        StaticCredentialsProvider.create(awsBasicCredentials))
                 .build();
 
     }
