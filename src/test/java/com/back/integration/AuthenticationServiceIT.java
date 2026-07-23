@@ -63,8 +63,7 @@ public class AuthenticationServiceIT {
 
 
 
-    //mvn verify -Dit.test=YourIntegrationTestIT#Mytestname
-    // mvn verify -Dit.test=AuthenticationServiceIT#shouldAuthenticateSuccessfully
+    //mvn failsafe:integration-test
     @Test
     void shouldAuthenticateSuccessfully(){
         AuthResponse response =
