@@ -32,7 +32,7 @@ cache:
 test:
   stage: test # A que etapa pertenece ese job, en cual ejecutar
   script: # Comandos de consola en este caso.. el Script de ejecucion
-    - mvn test
+    - mvn verify
 
 
   #guarda los archivos generados por un job para descargar o compartir
