@@ -47,3 +47,12 @@ export default function () {
   // Simula tiempo entre requests
   sleep(1);
 }
+
+
+//Peticiones simples (GET, POST, GraphQL).
+//check() y validaciones.
+//Manejo de autenticación (obtener y reutilizar un JWT).
+//Encadenar varias peticiones para simular un flujo de usuario.
+//Configurar distintos perfiles de carga con vus, duration y stages.
+//Usar scenarios para representar distintos tipos de usuarios concurrentes.
+//Añadir thresholds para definir criterios de éxito (por ejemplo, "el 95 % de las respuestas debe tardar menos de 500 ms" y "la tasa de errores debe ser menor al 1 %").
