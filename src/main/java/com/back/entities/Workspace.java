@@ -15,7 +15,6 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-//@ToString(exclude = {"members", "owner_id","projects"})
 @Getter
 @Setter
 public class Workspace {

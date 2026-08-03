@@ -10,19 +10,23 @@ import java.util.List;
 @Builder
 public class DashboardResponse {
 
-    //stats
-    private Long totalProjects;
-    private Long totalProjectInProgress;
+
     private TaskStats taskStats;
 
 
-    //private List<WorkspaceProductivityData> workspaceProductivityData;
-    private List<TaskPriorityDistributionResponse> tasksPriorityDistribution;
-    private List<TaskStatusDistributionResponse> tasksStatusDistribution;
+    private List<TaskStatusDistributionResponse> tasksPriorityDistribution;
+    private List<ProjectStatusDistributionResponse> projectStatusDistribution;
 
 
-    //upcoming tasks =>
+
+    private List<WorkspaceProductivityData> workspaceProductivityData;
+
+    //taskstrendsdata => 30 dias ant a hoy
+    private List<TaskTrendCL> taskTrendsData;
+
+    //upcoming tasks => sig 7 dias
+    private List<TaskResponse> upcomingTasks;
+
     //recent projects => dto del project, tomar los 5 ultimos creados por createdAt
-    //taskstrendsdata =>
-
+    private List<ProjectResponse> recentProjects;
 }

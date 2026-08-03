@@ -10,8 +10,9 @@ import lombok.*;
 @Builder
 public class TaskStats {
     private Long totalTasks;
-    private Long todoTasks;
-    private Long inProgressTasks;
-    private Long doneTasks;
-
+    private Long totalTodoTasks;
+    private Long totalInProgressTasks;
+    private Long totalDoneTasks;
+    private Long totalProjects;
+    private Long totalProjectInProgress;
 }

@@ -95,9 +95,17 @@ public class Task {
     @Builder.Default
     private List<Attachment> attachments = new ArrayList<>();
 
+
+
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
+
+        //Añadido para que el uptdate se actualize con el
+        //oncreate si sabe
+        LocalDateTime now = LocalDateTime.now();
+        createdAt = now;
+        updatedAt = now;
+
     }
 
     @PreUpdate

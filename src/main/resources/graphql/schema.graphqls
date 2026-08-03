@@ -74,17 +74,32 @@ type Workspace {
 
 }
 
+type ProjectStatusDistributionResponse {
+
+    status: ProjectStatus
+    count: Int
+}
+
+type WorkspaceProductivityData {
+    name: String
+    total: Int
+    completed: Int
+}
+
 type DashboardResponse{
 
-    totalProjects: Int
-    totalProjectInProgress: Int
     taskStats: TaskStats
 
-    tasksStatusDistribution: [TaskStatusDistributionResponse]
-    tasksPriorityDistribution: [TaskPriorityDistributionResponse]
+    tasksPriorityDistribution: [TaskStatusDistributionResponse]
+    projectStatusDistribution: [ProjectStatusDistributionResponse]
 
+    workspaceProductivityData :[WorkspaceProductivityData]
 
+    taskTrendsData: [TaskTrendCL]
 
+    upcomingTasks: [TaskResponse]
+
+    recentProjects: [ProjectResponse]
 
 }
 
@@ -98,12 +113,26 @@ type TaskStatusDistributionResponse{
     count: Int
 }
 
+type TaskTrendDto {
+    day: LocalDate
+    status:TaskStats
+    total:Int
+}
 
-type TaskStats{
+type TaskTrendCL {
+    day: LocalDateTime
+    priority:TaskPriority
+    total:Int
+}
+
+
+type TaskStats {
     totalTasks: Int
-    todoTasks: Int
-    inProgressTasks: Int
-    doneTasks: Int
+    totalTodoTasks: Int
+    totalInProgressTasks: Int
+    totalDoneTasks: Int
+    totalProjects: Int
+    totalProjectInProgress: Int
 
 }
 type TaskResponse {
@@ -123,6 +152,19 @@ type TaskResponse {
     subTasks:[SubTaskResponse]
 
 }
+
+type Task {
+    id: Int
+    title: String
+    description: String
+}
+
+type TaskTrendProjection {
+    day: Date
+    status: TaskStatus
+    total: Int
+}
+
 
 input CreateSubTask{
     title: String!
@@ -338,6 +380,21 @@ type CommentResponse {
 
 
 type Query {
+
+    dashboardTest(workspaceId:ID!) : String
+
+    dashboardTestDos(workspaceId:ID!):[Task]
+
+    dashboardTestTres(workspaceId:ID!):[Task]
+
+    perra(workspaceId:ID!):[TaskTrendCL]
+
+    currentDb :String
+    inet_server_addr:String
+    nancy:Int
+
+    donomar(workspaceId:ID!): [ProjectResponse]
+
     userList: [User]
 
     usersById(userIds: [ID]!):[User]

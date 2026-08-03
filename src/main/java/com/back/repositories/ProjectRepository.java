@@ -55,4 +55,25 @@ public interface ProjectRepository extends JpaRepository<Project,Long> {
     );
 
 
+
+    //Left va a priorizar los de la izq o primera q es Project y su select
+    @Query("""
+            SELECT 
+                p.name,
+                COUNT(t.id),
+                SUM(CASE WHEN t.priority = 'DONE' THEN 1 ELSE 0 END)
+            FROM Project p
+            LEFT JOIN Task t ON t.project.id = p.id
+            WHERE p.workspace.id = :workspaceId
+            GROUP BY p.id, p.name
+            """)
+    List<Object[]> getWorkspaceProductivity(UUID workspaceId);
+
+
+
+
+    List<Project> findTop5ByWorkspaceIdOrderByCreatedAtDesc(UUID workspaceId);
+
+
+
 }
