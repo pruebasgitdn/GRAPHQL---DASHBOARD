@@ -30,6 +30,18 @@ public class GraphQLTasksController {
     private final TasksService tasksService;
     private final SubTaskService subTaskService;
 
+    @PreAuthorize("isAuthenticated()")
+    @MutationMapping(name = "createTaskTest")
+    public TaskResponse createTaskTest(@Argument(name = "taskInput") CreateTaskInputTest createTaskInput,
+                                   @AuthenticationPrincipal UserDetailsImpl authenticated
+
+    ){
+        if(authenticated == null){
+            throw new AuthenticationCredentialsNotFoundException("No se econtraron las credenciales de autenticacion");
+        }
+
+        return tasksService.createTaskTest(createTaskInput,authenticated.getId());
+    }
 
     //  Crear task
     @PreAuthorize("isAuthenticated()")

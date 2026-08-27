@@ -10,6 +10,8 @@ import com.back.entities.mappers.TaskAssigneeMapper;
 import com.back.entities.mappers.TasksMapper;
 import com.back.entities.mappers.UserMapper;
 import com.back.enums.NotificationType;
+import com.back.enums.TaskPriority;
+import com.back.exceptions.AlreadyExistException;
 import com.back.exceptions.ItemNotFoundException;
 import com.back.repositories.*;
 import com.back.services.*;
@@ -64,61 +66,78 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
 
     @Transactional
     @Override
-    public TaskAssigneeResponse createAssignation(Long taskId, UUID user_assign, UUID currentUser,UUID workspaceId) {
+    public TaskAssigneeResponse createAssignation(Long taskId,
+                                                  UUID user_assign,
+                                                  UUID currentUser
+                                                  ) {
 
-        //encontrar tarea
-        TaskResponse taskResponse = tasksService.getTask(taskId);
-        if(taskResponse == null){
+        Task task = tasksRepository.findById(taskId).orElseThrow(()->{
             throw new ItemNotFoundException("Tarea no encontrada");
+        });
+
+        if (Objects.equals(task.getPriority(), TaskPriority.BLOCKED)) {
+            throw  new RuntimeException("Esta tarea esta BLOQUEADA, por lo que no se puede asignar");
+
+        }
+        if (Objects.equals(task.getPriority(), TaskPriority.DONE)) {
+            throw  new RuntimeException("Esta tarea esta COMPLETADA, por lo que no se puede asignar");
+
         }
 
-        //encontrar user
-        UserResponse user = userService.findById(user_assign);
-        if(user == null){
-            throw new ItemNotFoundException("Usuario no encontrado");
-        }
+        UUID workspaceId = task.getProject()
+                .getWorkspace()
+                .getId();
+
 
         //ecntonrar espacio de trabjo
-       // UUID workspaceId = taskResponse.getProject().getWorkspace().getId();
         if(workspaceId == null){
             throw new ItemNotFoundException("Espacio de trabajo no encontrado");
         }
+
+        User user_Assign = userRepository.findById(user_assign).orElseThrow(()->{
+            throw new ItemNotFoundException("Usuario no encontrado");
+        });
 
         if (!workspaceMemberService.isMember(workspaceId,currentUser)) {
             throw new RuntimeException("No eres miembro del espacio para asignar una tarea");
         }
 
-        if(!workspaceMemberService.isMember(workspaceId,user.getId())){
+        if(!workspaceMemberService.isMember(workspaceId,user_Assign.getId())){
             throw new RuntimeException("El usuario asignado no es miembro del espacio de trabajo");
         }
 
-
-        User userEntity = userMapper.FromResponseToEntity(user);
-        Task taskEntity =  tasksMapper.toEntity(taskResponse);
+        //
 
         TaskAssignee taskAssignee = TaskAssignee.builder()
-                .task(taskEntity)
-                .user(userEntity)
+                .task(task)
+                .user(user_Assign)
                 .build();
+
+        if(taskAssigneeRepository.existsByUserIdAndTaskId(user_assign,taskId)){
+            throw  new AlreadyExistException("Esta tarea ya esta asignada a este usario");
+        }
+
 
         taskAssigneeRepository.save(taskAssignee);
 
         //Emitir notificacion
         NotificationResponse notification = NotificationResponse.builder()
-                .user(user)
+                .user(userMapper.toResponse(user_Assign))
                 .title("Tienes una nueva tarea asignada")
                 .message("Se te ha asignado una nueva tarea")
                 .type(NotificationType.ASSIGN)
                 .build();
 
-        notificationPublisher.publish(userEntity.getId().toString(),notification);
+        notificationPublisher.publish(user_Assign.getId().toString(),notification);
         Notification notificationEnt  = notificationMapper.toEntity(notification);
         notificationRepository.save(notificationEnt);
 
 
+        TaskResponse taskResponse = tasksMapper.toResponse(task);
+
         TaskAssigneeResponse taskAssigneeResponse = TaskAssigneeResponse.builder()
                 .task(taskResponse)
-                .user(user)
+                .user(userMapper.toResponse(user_Assign))
                 .build();
 
         return taskAssigneeResponse;
@@ -206,7 +225,7 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
     @Override
     public List<TaskAssigneeResponse> assignationsByUserId(UUID ownerId) {
 
-        //verificar existencai
+        //verificar existencia
         Optional<User> user = userRepository.findById(ownerId);
 
         if(user.isEmpty()){
@@ -218,8 +237,7 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
         if(taskAssignees.isEmpty()){
           throw new ItemNotFoundException("No se se encontraron tareas asignadas a este id del usuario: "+user.get().getId());
         }
-
-
+        
         return taskAssignees.stream()
                 .map(taskAssigneeMapper::toResponse)
                 .toList();

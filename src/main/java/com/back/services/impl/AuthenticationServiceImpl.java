@@ -7,10 +7,7 @@ import com.back.exceptions.InvalidCredentialsException;
 import com.back.exceptions.UserNotFoundException;
 import com.back.repositories.UserRepository;
 import com.back.services.*;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -155,15 +152,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .getBody();
         }catch (ExpiredJwtException ex){
             return ex.getClaims();
-        }
+        } catch (JwtException ex) {
+            System.out.println("========== JWT ERROR ==========");
+            System.out.println("Tipo: " + ex.getClass().getName());
+            System.out.println("Mensaje: " + ex.getMessage());
+            System.out.println("Token: " + token);
+            System.out.println("===============================");
+
+            return null;}
         
       
     }
 
     @Override
     public boolean isAccessToken(String token) {
-        return "access".equals(extractClaimsAllowExpired(token).get("type"));
+        //return "access".equals(extractClaimsAllowExpired(token).get("type"));
+
+        Claims claims = extractClaimsAllowExpired(token);
+        return claims != null &&
+                "access".equals(claims.get("type"));
+        //return
     }
+
 
     @Override
     public boolean isRefreshToken(String token) {

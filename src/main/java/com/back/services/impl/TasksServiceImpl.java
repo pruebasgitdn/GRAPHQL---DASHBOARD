@@ -1,12 +1,7 @@
 package com.back.services.impl;
 
-import com.back.entities.Project;
-import com.back.entities.Task;
-import com.back.entities.TaskLabel;
-import com.back.entities.User;
-import com.back.entities.dto.CreateTaskInput;
-import com.back.entities.dto.EditTaskInput;
-import com.back.entities.dto.TaskResponse;
+import com.back.entities.*;
+import com.back.entities.dto.*;
 import com.back.entities.mappers.ProjectMapper;
 import com.back.entities.mappers.TasksMapper;
 import com.back.enums.TaskPriority;
@@ -14,14 +9,12 @@ import com.back.enums.TaskStatus;
 import com.back.exceptions.AlreadyExistException;
 import com.back.exceptions.ItemNotFoundException;
 import com.back.exceptions.UserNotFoundException;
-import com.back.repositories.ProjectRepository;
-import com.back.repositories.TaskAssigneeRepository;
-import com.back.repositories.TasksRepository;
-import com.back.repositories.UserRepository;
+import com.back.repositories.*;
 import com.back.services.TaskLabelService;
 import com.back.services.TasksService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -29,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,15 +35,20 @@ public class TasksServiceImpl implements TasksService {
     private final ProjectRepository projectRepository;
     private final TaskAssigneeRepository taskAssigneeRepository;
     private final UserRepository userRepository;
+    private final WorkspaceRepository workspaceRepository;
+    private final WorkspaceMemberRepository workspaceMemberRepository;
+
 
     private final TasksMapper tasksMapper;
     private final ProjectMapper projectMapper;
     private final TaskLabelService taskLabelService;
+    private final CacheManager cacheManager;
 
 
     @Transactional
     @Override
     public TaskResponse createTask(CreateTaskInput createTaskInput,UUID owner_id) {
+
 
         //encontrar proyecto
         Project project = projectRepository.findById(createTaskInput.getProjectId())
@@ -65,15 +64,99 @@ public class TasksServiceImpl implements TasksService {
             throw new ItemNotFoundException("Creador no encontrado");
         });
 
-        //tLbalel
-
-
-
-
+        //tLbale
         Task taskToSave = Task.builder()
                 .title(createTaskInput.getTitle())
                 .description(createTaskInput.getDescription())
                 .project(project)
+                .priority(createTaskInput.getPriority())
+                .status(createTaskInput.getStatus())
+                //.actualHours(createTaskInput.getActualHours())
+                //.completedAt(createTaskInput.getCompletedAt())
+                .estimatedHours(createTaskInput.getEstimatedHours())
+                .isArchived(false)
+                .dueDate(createTaskInput.getDueDate())
+                .owner(owner)
+                .build();
+
+        Task savedTask = tasksRepository.save(taskToSave);
+
+        //Label
+        if (createTaskInput.getLabels() != null && !createTaskInput.getLabels().isEmpty()) {
+            taskLabelService.createManyTaskLabel(savedTask, createTaskInput.getLabels());
+        }
+        //sincronizar los cambios realizados en las entidades gestionad
+        //y la previa gestion de la creacion de los label en caso de haberlost
+        tasksRepository.flush();
+
+        Task fullTask = tasksRepository.findByIdWithLabels(savedTask.getId())
+                .orElseThrow(()-> new ItemNotFoundException("No se encontraron resultados"));
+
+        return tasksMapper.toResponse(fullTask);
+
+    }
+
+    @Override
+    public TaskResponse createTaskTest(CreateTaskInputTest createTaskInput, UUID creator) {
+
+        //1. fetch todos los wpsaces DE LOS QUE SE ES MIEMBRO
+//        List<Workspace> workspaceList = workspaceRepository.findAll();
+//        if(workspaceList.isEmpty()){
+//            throw new ItemNotFoundException("No hay espacios de trabajo por el momento para poder crear una tarea");
+//        }
+        List<WorkspaceMember> wpmmm = workspaceMemberRepository.findAllByUserId(creator);
+        if(wpmmm.isEmpty()){
+            throw new ItemNotFoundException("No hay espacios de trabajo por el momento para poder crear una tarea");
+        }
+
+        System.out.println("wspaceList: "+wpmmm);
+
+        //2. de esos wpsaces compararlo con el que mando el user
+        UUID selectedWorkspace = wpmmm.stream()
+                .filter(workspace ->
+                        Objects.equals(
+                                workspace.getWorkspace().getId(),
+                                createTaskInput.getWorkspaceId()
+                        )
+                )
+                .findFirst()
+                .map(workspaceMember -> workspaceMember.getWorkspace().getId())
+                .orElseThrow(() ->
+                        new ItemNotFoundException("Espacio de trabajo no encontrado")
+                );
+
+        System.out.println("wspace Selected: "+selectedWorkspace);
+
+
+        //3.Obtener los proyectos del espacio de trabajo seleccionado
+        List<Project> relatedProjects = projectRepository.findAllByWorkspaceId(selectedWorkspace);
+        if(relatedProjects.isEmpty()){
+            throw new ItemNotFoundException("No hay proyectos asociados por el momento para poder crear una tarea");
+        }
+        System.out.println("related projects: "+relatedProjects);
+
+
+        Project selectedProject = relatedProjects.stream()
+                .filter(p ->
+                        Objects.equals(
+                                p.getId(),
+                                createTaskInput.getProjectId()
+                        )
+                )
+                .findFirst()
+                .orElseThrow(() -> new ItemNotFoundException("Proyecto no encontrado"));
+
+        System.out.println("sekected projects: "+selectedProject);
+
+        User owner = userRepository.findById(creator).orElseThrow(()->{
+            throw new ItemNotFoundException("Creador no encontrado");
+        });
+
+        //tLbale
+        Task taskToSave = Task.builder()
+                .title(createTaskInput.getTitle())
+                .description(createTaskInput.getDescription())
+                .project(selectedProject)
                 .priority(createTaskInput.getPriority())
                 .status(createTaskInput.getStatus())
                 //.actualHours(createTaskInput.getActualHours())
@@ -175,8 +258,18 @@ public class TasksServiceImpl implements TasksService {
     public Boolean deleteTask(Long id) {
 
 
+        Task task = tasksRepository.findById(id).orElseThrow(()->{
+            throw  new ItemNotFoundException("No existe esa tarea");
+        });
+
+
         //TODO: emitir notif o algo
-        tasksRepository.deleteById(id);
+        tasksRepository.deleteById(task.getId());
+
+        UUID workspaceId = task.getProject().getWorkspace().getId();
+
+        cacheManager.getCache("dashboard").evict(workspaceId);
+
 
         return true;
     }
@@ -191,11 +284,19 @@ public class TasksServiceImpl implements TasksService {
             throw new IllegalArgumentException("El titulo no puede superar los 70 caracteres");
         }
 
+        Task task = tasksRepository.findById(id).orElseThrow(()->{
+            throw  new ItemNotFoundException("No existe esa tarea");
+        });
+
        int updated =  tasksRepository.updateTitleById(id,newTitle);
 
         if(updated == 0){
             throw new ItemNotFoundException("Tarea no encontrada");
         }
+
+        UUID workspaceId = task.getProject().getWorkspace().getId();
+
+        cacheManager.getCache("dashboard").evict(workspaceId);
 
         return true;
     }
@@ -210,11 +311,19 @@ public class TasksServiceImpl implements TasksService {
             throw new IllegalArgumentException("La descripción no puede superar los 200 caracteres");
         }
 
+        Task task = tasksRepository.findById(id).orElseThrow(()->{
+            throw  new ItemNotFoundException("No existe esa tarea");
+        });
+
         int updated =  tasksRepository.updateDescriptionById(id,newDescription);
+
 
         if(updated == 0){
             throw new ItemNotFoundException("Tarea no encontrada");
         }
+        UUID workspaceId = task.getProject().getWorkspace().getId();
+
+        cacheManager.getCache("dashboard").evict(workspaceId);
 
         return true;
 
@@ -239,6 +348,9 @@ public class TasksServiceImpl implements TasksService {
         if(updated == 0){
             throw new ItemNotFoundException("Tarea no encontrada");
         }
+        UUID workspaceId = task.getProject().getWorkspace().getId();
+
+        cacheManager.getCache("dashboard").evict(workspaceId);
 
         return true;
 
@@ -247,7 +359,10 @@ public class TasksServiceImpl implements TasksService {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = "task", key = "#id")}
+            @CacheEvict(value = "task", key = "#id"),
+            //@CacheEvict(value = "dashboard", key = "#id")
+
+    }
     )
     public Boolean editTaskPriority(TaskPriority priority,Long id) {
 
@@ -259,12 +374,16 @@ public class TasksServiceImpl implements TasksService {
             throw  new ItemNotFoundException("Tarea no encontrada");
         });
 
-
         int updated =  tasksRepository.updatePriorityById(task.getId(),priority);
 
         if(updated == 0){
             throw new ItemNotFoundException("Tarea no encontrada");
         }
+        UUID workspaceId = task.getProject()
+                .getWorkspace()
+                .getId();
+        
+        cacheManager.getCache("dashboard").evict(workspaceId);
 
         return true;
     }

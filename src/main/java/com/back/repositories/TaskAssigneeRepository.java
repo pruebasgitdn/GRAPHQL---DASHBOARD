@@ -24,5 +24,7 @@ public interface TaskAssigneeRepository extends JpaRepository<TaskAssignee,Long>
     """)
     Set<UUID> findAssignedUserIdsByTaskId(Long taskId);
 
+    boolean existsByUserIdAndTaskId(UUID userId, Long taskId);
+
 
 }

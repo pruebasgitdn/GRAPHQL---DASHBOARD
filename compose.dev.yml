@@ -3,6 +3,7 @@ services:
   app:
     #imagen de maven java q tiene la V de maven y la V de java
     #que es en ese entorno q corre la api si sabe
+    #docker compose -f compose.dev.yml up
     image: maven:3.9.9-eclipse-temurin-21
 
     env_file: #inyectar las variables env a docker

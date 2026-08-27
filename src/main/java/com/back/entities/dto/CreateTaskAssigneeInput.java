@@ -21,8 +21,8 @@ public class CreateTaskAssigneeInput {
     @NotNull(message = "Llena el id del usuario a asignar")
     private UUID userId;
 
-    @NotNull(message = "Ingresalo, para saber si es miembro de ese espacio")
-    private UUID workspaceId;
+//    @NotNull(message = "Ingresalo, para saber si es miembro de ese espacio")
+//    private UUID workspaceId;
 
 
 

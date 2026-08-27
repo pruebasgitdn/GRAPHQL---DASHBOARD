@@ -2,6 +2,7 @@ package com.back.services;
 
 import com.back.entities.Task;
 import com.back.entities.dto.CreateTaskInput;
+import com.back.entities.dto.CreateTaskInputTest;
 import com.back.entities.dto.EditTaskInput;
 import com.back.entities.dto.TaskResponse;
 import com.back.enums.TaskPriority;
@@ -13,6 +14,8 @@ import java.util.UUID;
 public interface TasksService {
 
     TaskResponse createTask(CreateTaskInput createTaskInput,UUID creator);
+
+    TaskResponse createTaskTest(CreateTaskInputTest createTaskInput, UUID creator);
 
     List<TaskResponse> findAllTasks();
 

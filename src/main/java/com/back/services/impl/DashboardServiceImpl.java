@@ -11,6 +11,9 @@ import com.back.repositories.ProjectRepository;
 import com.back.repositories.TasksRepository;
 import com.back.services.DashboardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,10 @@ public class DashboardServiceImpl implements DashboardService {
 
 
     @Override
+
+    //TODO: MEter el cacheable ajustarlo a todos los metodos de task
+    //TODO: todos los meotods de projects y workpsace
+    @Cacheable(value = "dashboard", key = "#workspaceId")
     public DashboardResponse dashboardStatsByWorkspace(UUID workspaceId) {
 
         Long totalProjects = projectRepository.countByWorkspaceId(workspaceId);

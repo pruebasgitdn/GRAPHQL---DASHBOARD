@@ -38,7 +38,7 @@ public class GrapQLTaskAssigneeController {
         UUID user_id = authenticated.getId();
 
         return  taskAssigneeService.createAssignation(taskAssigneeInput.getTaskId()
-                ,taskAssigneeInput.getUserId(),user_id,taskAssigneeInput.getWorkspaceId());
+                ,taskAssigneeInput.getUserId(),user_id);
 
 
     }

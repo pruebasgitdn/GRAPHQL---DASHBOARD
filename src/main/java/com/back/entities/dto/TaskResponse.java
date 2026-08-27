@@ -23,6 +23,8 @@ public class TaskResponse {
 
     private Long id;
 
+    private Long project_id;
+
     private String title;
 
     private String description;

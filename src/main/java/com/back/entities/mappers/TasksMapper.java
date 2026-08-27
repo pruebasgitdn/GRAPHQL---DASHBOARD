@@ -30,8 +30,10 @@ public class TasksMapper {
 
         UserResponse owner = userMapper.toResponse(task.getOwner());
 
+
         return TaskResponse.builder()
                 .id(task.getId())
+                .project_id(task.getProject().getId())
                 .title(task.getTitle())
                 .description(task.getDescription())
                 //.project(projectMapper.toResponseWithoutCount(task.getProject()))
@@ -68,6 +70,7 @@ public class TasksMapper {
     }
 
 
+
     //sinproject para evitar dependencias circulares
     public TaskResponse toResponseWithoutProject(Task task){
 
@@ -75,6 +78,7 @@ public class TasksMapper {
 
         return TaskResponse.builder()
                 .id(task.getId())
+                .project_id(task.getProject().getId())
                 .title(task.getTitle())
                 .description(task.getDescription())
                 .status(task.getStatus())

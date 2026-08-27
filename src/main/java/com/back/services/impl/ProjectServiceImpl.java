@@ -21,6 +21,7 @@ import com.back.services.UserService;
 import com.back.services.WorkspaceMemberService;
 import com.back.services.WorkspaceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -41,7 +42,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectMapper projectMapper;
     private final WorkspaceMemberService workspaceMemberService;
-
+    private final CacheManager cacheManager;
 
 
     @Override
@@ -153,7 +154,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Caching(evict = {
 
             @CacheEvict(value = "project", key = "#id"),
-            //@CacheEvict(value = "workspaces", key = "'all'")
     })
     public ProjectResponse editProject(Long id,EditProjectInput editProjectInput) {
 
@@ -185,6 +185,11 @@ public class ProjectServiceImpl implements ProjectService {
 
         }
 
+        UUID workspaceId = project.getWorkspace().getId();
+
+        cacheManager.getCache("dashboard").evict(workspaceId);
+
+
         projectRepository.save(project);
 
         Long count = tasksRepository.countByProjectId(project.getId());
@@ -196,7 +201,15 @@ public class ProjectServiceImpl implements ProjectService {
     @CacheEvict(value = "project", key = "#id")
     public Boolean deleteProject(Long id) {
 
-        projectRepository.deleteById(id);
+        Project project = projectRepository.findById(id).orElseThrow(()->{
+           throw new ItemNotFoundException("Proyecto no encontrado");
+        });
+
+        UUID workspaceId = project.getWorkspace().getId();
+
+        projectRepository.deleteById(project.getId());
+
+        cacheManager.getCache("dashboard").evict(workspaceId);
 
         //TODO: emitir notificacion o algo
 
