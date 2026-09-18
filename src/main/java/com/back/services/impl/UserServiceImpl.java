@@ -9,6 +9,7 @@ import com.back.exceptions.ItemNotFoundException;
 import com.back.repositories.UserRepository;
 import com.back.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,6 +76,7 @@ public class UserServiceImpl implements UserService {
 
          }
 
+    @Cacheable(value = "users", key = "'all'")
     @Transactional(readOnly = true)
     @Override
     public List<UserResponse> findAll() {

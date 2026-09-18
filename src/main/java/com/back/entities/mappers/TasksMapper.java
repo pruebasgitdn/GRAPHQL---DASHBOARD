@@ -24,6 +24,7 @@ public class TasksMapper {
 
     private final ProjectMapper projectMapper;
     private final UserMapper  userMapper;
+    private final SubTaskMapper subTaskMapper;
 
 
     public TaskResponse toResponse(Task task){
@@ -127,6 +128,44 @@ public class TasksMapper {
             task.setPriority(input.getPriority());
         }
     }
+
+    public TaskLabelProjectDto toTaskLabelProjectDto(Task task) {
+
+        return TaskLabelProjectDto.builder()
+                .id(task.getId())
+                .project_id(
+                        task.getProject() != null
+                                ? task.getProject().getId()
+                                : null
+                )
+                .project_name(
+                        task.getProject() != null
+                                ? task.getProject().getName()
+                                : null
+                )
+                .title(task.getTitle())
+                .description(task.getDescription())
+                .status(task.getStatus())
+                .priority(task.getPriority())
+                .isArchived(task.getIsArchived())
+                .owner(userMapper.toResponse(task.getOwner()))
+                .estimatedHours(task.getEstimatedHours())
+                .actualHours(task.getActualHours())
+                .completedAt(task.getCompletedAt())
+                .createdAt(task.getCreatedAt())
+                .dueDate(task.getDueDate())
+                .subTasks(
+                        task.getSubtasks()
+                                .stream()
+                                .map(subTaskMapper::toResponse)
+                                .toList()
+                )
+                .labels(task.getLabels().stream()
+                        .map(TaskLabel::getLabel)
+                        .toList())
+                .build();
+    }
+
 
 
 

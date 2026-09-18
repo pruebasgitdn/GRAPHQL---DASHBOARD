@@ -1,10 +1,7 @@
 package com.back.services;
 
 import com.back.entities.Task;
-import com.back.entities.dto.CreateTaskInput;
-import com.back.entities.dto.CreateTaskInputTest;
-import com.back.entities.dto.EditTaskInput;
-import com.back.entities.dto.TaskResponse;
+import com.back.entities.dto.*;
 import com.back.enums.TaskPriority;
 import com.back.enums.TaskStatus;
 
@@ -18,6 +15,10 @@ public interface TasksService {
     TaskResponse createTaskTest(CreateTaskInputTest createTaskInput, UUID creator);
 
     List<TaskResponse> findAllTasks();
+
+    TaskLabelProjectDto findTaskWithLabelsAndProjectName(Long id);
+    TaskLabelProjectDto findTaskWithLabelsAndProjectNameZZZ(Long id);
+
 
     TaskResponse getTask(Long id);
 

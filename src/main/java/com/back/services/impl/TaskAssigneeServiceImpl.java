@@ -1,10 +1,7 @@
 package com.back.services.impl;
 
 import com.back.entities.*;
-import com.back.entities.dto.NotificationResponse;
-import com.back.entities.dto.TaskAssigneeResponse;
-import com.back.entities.dto.TaskResponse;
-import com.back.entities.dto.UserResponse;
+import com.back.entities.dto.*;
 import com.back.entities.mappers.NotificationMapper;
 import com.back.entities.mappers.TaskAssigneeMapper;
 import com.back.entities.mappers.TasksMapper;
@@ -223,7 +220,7 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<TaskAssigneeResponse> assignationsByUserId(UUID ownerId) {
+    public List<TaskAssigneeResponseLblPrName> assignationsByUserId(UUID ownerId) {
 
         //verificar existencia
         Optional<User> user = userRepository.findById(ownerId);
@@ -239,7 +236,7 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
         }
         
         return taskAssignees.stream()
-                .map(taskAssigneeMapper::toResponse)
+                .map(taskAssigneeMapper::toResponseLblPrName)
                 .toList();
     }
 
@@ -272,6 +269,20 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
         List<TaskAssignee> allAssignees =  taskAssigneeRepository.findAll();
 
         return allAssignees.stream().map(taskAssigneeMapper::toResponse).toList();
+    }
+
+    @Override
+    public List<MyTasksDto> assignationsByUserIdRMX(UUID owner) {
+
+         List<Task>  assignees = taskAssigneeRepository.findUserTasks(owner);
+
+         if(assignees.isEmpty()){
+             throw new ItemNotFoundException("No se encontraron tareas asignadas a este usuario");
+         }
+
+        return assignees.stream()
+                .map(taskAssigneeMapper::toMyTasksDto)
+                .toList();
     }
 
 

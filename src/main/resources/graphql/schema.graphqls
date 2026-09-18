@@ -221,6 +221,24 @@ type AuthResponse {
     userId: ID!
     expiresIn: Int!
 }
+type TaskLabelProjectDto {
+    id: Int
+    project_id:Int
+    project_name: String
+    title: String
+    description: String
+    status: TaskStatus
+    priority: TaskPriority
+    estimatedHours: Float
+    completedAt: LocalDateTime
+    createdAt: LocalDateTime
+    isArchived: Boolean
+    owner:User
+    actualHours:Float
+    dueDate: LocalDate
+    labels:[TaskLabelType]
+    subTasks:[SubTaskResponse]
+}
 
 input CreateTaskAssigneeInput {
     taskId: Int!
@@ -233,9 +251,15 @@ type TaskAssigneeResponse {
     user: User
 }
 
+type TaskAssigneeResponseLblPrName {
+    task: TaskLabelProjectDto
+    user: User
+}
+
 type WorkspaceResponse {
     id: ID!
     name: String!
+    description:String
     owner: User!
     createdAt: String
     updatedAt: String
@@ -395,8 +419,36 @@ type CommentResponse {
     user:User
 }
 
+type MyTasksDto {
+
+    id: Int
+    title: String
+    description: String
+    completedAt: LocalDateTime
+    isArchived: Boolean
+    actualHours: Float
+    estimatedHours: Float
+    status: TaskStatus
+    priority: TaskPriority
+    dueDate: LocalDate
+    createdAt: LocalDateTime
+    updatedAt: DateTime
+
+    project_id: Int
+    workspace_id: ID
+
+    owner: User
+}
+
 
 type Query {
+
+
+    getTaskLabelsAndProj(taskId: Int!): TaskLabelProjectDto
+
+    getTaskLabelsAndProjZZZ(taskId: Int!): TaskLabelProjectDto
+
+    assignationsByUserIdRemix(userId: ID!): [MyTasksDto]
 
     dashboardTest(workspaceId:ID!) : String
 
@@ -448,7 +500,7 @@ type Query {
 
     allAssignations: [TaskAssigneeResponse!]
 
-    assignationsByUserId(userId: ID!): [TaskAssigneeResponse!]
+    assignationsByUserId(userId: ID!): [TaskAssigneeResponseLblPrName!]
 
     assignationsByTaskId(taskId: Int!): [TaskAssigneeResponse!]
 

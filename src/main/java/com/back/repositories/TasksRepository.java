@@ -224,6 +224,27 @@ WHERE t.createdAt BETWEEN :startDate AND :endDate
                                  LocalDate nextWeek);
 
 
+    @Query("""
+    SELECT DISTINCT t
+    FROM Task t
+    LEFT JOIN FETCH t.project
+    LEFT JOIN FETCH t.labels
+    WHERE t.id = :taskId
+""")
+    Optional<Task> findByIdWithProjectAndLabels(
+            @Param("taskId") Long taskId
+    );
+
+    @Query("""
+    SELECT t
+    FROM Task t
+    LEFT JOIN FETCH t.labels
+    WHERE t.id = :taskId
+""")
+    Optional<Task> findByIdWithProjectAndLabelZZZ(
+            @Param("taskId") Long taskId
+    );
+
     @Query(value = "SELECT current_database()", nativeQuery = true)
     String currentDatabase();
 

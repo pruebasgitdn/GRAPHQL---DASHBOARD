@@ -150,7 +150,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                     Long memberCount = workspaceMemberRepository.countByWorkspaceId(p.getId());
                     Long projectCount = projectRepository.countByWorkspaceId(p.getId());
                     return workspaceMapper.toResponse(p,memberCount,projectCount);
-                })
+                })  
                 .toList();
     }
 

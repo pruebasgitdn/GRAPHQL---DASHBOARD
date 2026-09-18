@@ -160,6 +160,23 @@ public class GraphQLTasksController {
         return loader.load(taskResponse.getId());
     }
 
+    @QueryMapping(name = "getTaskLabelsAndProj")
+    public TaskLabelProjectDto getTaskLabelsAndProj(@Argument(name = "taskId") Long taskId
+    ){
+
+        return tasksService.findTaskWithLabelsAndProjectName(taskId);
+    }
+
+
+    @QueryMapping(name = "getTaskLabelsAndProjZZZ")
+    public TaskLabelProjectDto getTaskLabelsAndProjZZZ(@Argument(name = "taskId") Long taskId
+    ){
+
+        return tasksService.findTaskWithLabelsAndProjectNameZZZ(taskId);
+    }
+
+
+
 
 
 }

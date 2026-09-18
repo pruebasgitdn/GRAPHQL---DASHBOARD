@@ -71,9 +71,16 @@ public class GrapQLTaskAssigneeController {
 
     // Obtener todas las asignaciones por user_id
     @QueryMapping(name = "assignationsByUserId")
-    public List<TaskAssigneeResponse> assignationsByUserId(@Valid @Argument UUID userId) {
+    public List<TaskAssigneeResponseLblPrName> assignationsByUserId(@Valid @Argument UUID userId) {
 
         return  taskAssigneeService.assignationsByUserId(userId);
+
+    }
+
+    @QueryMapping(name = "assignationsByUserIdRemix")
+    public List<MyTasksDto> assignationsByUserIdRemix(@Valid @Argument UUID userId) {
+
+        return  taskAssigneeService.assignationsByUserIdRMX(userId);
 
     }
 

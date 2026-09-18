@@ -42,13 +42,13 @@ public class RedisConfig {
             redisMapper.registerModule(new JavaTimeModule());
             redisMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-            redisMapper.activateDefaultTyping(
-                    BasicPolymorphicTypeValidator.builder()
-                            .allowIfSubType(Object.class)
-                            .build(),
-                    ObjectMapper.DefaultTyping.NON_FINAL,
-                    JsonTypeInfo.As.PROPERTY
-            );
+//            redisMapper.activateDefaultTyping(
+//                    BasicPolymorphicTypeValidator.builder()
+//                            .allowIfSubType(Object.class)
+//                            .build(),
+//                    ObjectMapper.DefaultTyping.NON_FINAL,
+//                    JsonTypeInfo.As.PROPERTY
+//            );
 
             GenericJackson2JsonRedisSerializer serializer =
                     new GenericJackson2JsonRedisSerializer(redisMapper);

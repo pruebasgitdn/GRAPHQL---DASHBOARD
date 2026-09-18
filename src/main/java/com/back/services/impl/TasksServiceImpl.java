@@ -199,6 +199,42 @@ public class TasksServiceImpl implements TasksService {
                 .toList();
     }
 
+    @Override
+    public TaskLabelProjectDto findTaskWithLabelsAndProjectName(Long taskId) {
+
+        Task task = tasksRepository.findByIdWithProjectAndLabels(taskId)
+                .orElseThrow(() ->
+                        new ItemNotFoundException("No se encontraron registros")
+                );
+
+
+        System.out.println("TASK ID: " + task.getId());
+        System.out.println("PROJECT: " + task.getProject());
+        System.out.println("LABELS: " + task.getLabels());
+        System.out.println("LABELS SIZE: " + task.getLabels().size());
+        return tasksMapper.toTaskLabelProjectDto(task);
+
+
+    }
+
+    @Override
+    public TaskLabelProjectDto findTaskWithLabelsAndProjectNameZZZ(Long id) {
+
+        Task task = tasksRepository.findByIdWithProjectAndLabelZZZ(id)
+                .orElseThrow(() ->
+                        new ItemNotFoundException("No se encontraron registros")
+                );
+
+
+        System.out.println("TASK ID: " + task.getId());
+        System.out.println("PROJECT: " + task.getProject());
+        System.out.println("LABELS: " + task.getLabels());
+        System.out.println("LABELS SIZE: " + task.getLabels().size());
+
+
+        return tasksMapper.toTaskLabelProjectDto(task);
+    }
+
     @Cacheable(value = "task", key = "#id")
     @Transactional(readOnly = true)
     @Override
