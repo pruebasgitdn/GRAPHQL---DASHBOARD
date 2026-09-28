@@ -50,6 +50,16 @@ public class RedisConfig {
 //                    JsonTypeInfo.As.PROPERTY
 //            );
 
+            redisMapper.activateDefaultTyping(
+                    BasicPolymorphicTypeValidator.builder()
+                            .allowIfSubType("com.back")
+                            .allowIfSubType("java.util")
+                            .allowIfSubType("java.time")
+                            .build(),
+                    ObjectMapper.DefaultTyping.NON_FINAL,
+                    JsonTypeInfo.As.PROPERTY
+            );
+
             GenericJackson2JsonRedisSerializer serializer =
                     new GenericJackson2JsonRedisSerializer(redisMapper);
 

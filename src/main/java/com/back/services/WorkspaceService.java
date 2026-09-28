@@ -15,6 +15,10 @@ public interface WorkspaceService {
 
     WorkSpaceDetailResponse findById(UUID id);
 
+
+    WorkSpaceDetailResponse findByIdRemix(UUID id);
+
+
     WorkspaceResponse addMemberToWorkspace(List<UUID> users, UUID workspace_id,UUID owner_id);
 
     //sin verificar el owner pq se añade cuando el invitado acepte en en el link

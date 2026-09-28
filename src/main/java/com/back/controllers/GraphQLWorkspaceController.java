@@ -69,6 +69,12 @@ public class GraphQLWorkspaceController {
         return workspaceService.findById(id);
     }
 
+    @QueryMapping(name = "workspaceRemix")
+    public WorkSpaceDetailResponse workspaceRemix(@Argument(name = "id") UUID id ){
+        return workspaceService.findByIdRemix(id);
+    }
+
+
 
     @PreAuthorize("isAuthenticated()")
     @MutationMapping(name = "addMembersToWorkspace")

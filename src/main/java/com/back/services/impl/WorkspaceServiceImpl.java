@@ -165,10 +165,35 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                 .orElseThrow(() -> new ItemNotFoundException("Espacio de trabajo no encontrado por el id: " + id));
 
         List<MemberRoleResponse> memberRoles = workspaceMemberService.getMembersFromWorkspace(workspace.getId());
+
         System.out.print(memberRoles);
+
         long memberCount = memberRoles.size();
+
         return  workspaceMapper.toDetailResponse(workspace,memberCount,memberRoles);
     }
+
+    @Override
+    public WorkSpaceDetailResponse findByIdRemix(UUID id) {
+        Workspace workspace = workspaceRepository.findByIdWithMembers(id)
+                .orElseThrow(() ->
+                        new ItemNotFoundException(
+                                "Espacio de trabajo no encontrado por el id: " + id
+                        )
+                );
+
+        List<MemberRoleResponse> memberRoles = workspace.getMembers()
+                .stream()
+                .map(workspaceMemberMapper::toMemberRole)
+                .toList();
+
+
+
+        return workspaceMapper.toDetailResponse(
+                workspace,
+                Long.valueOf(memberRoles.size()),
+                memberRoles
+        );    }
 
 
     @Transactional

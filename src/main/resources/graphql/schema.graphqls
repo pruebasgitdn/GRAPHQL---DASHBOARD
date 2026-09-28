@@ -259,7 +259,6 @@ type TaskAssigneeResponseLblPrName {
 type WorkspaceResponse {
     id: ID!
     name: String!
-    description:String
     owner: User!
     createdAt: String
     updatedAt: String
@@ -475,6 +474,8 @@ type Query {
     workspaceList: [WorkspaceResponse]
 
     workspace(id: ID!): WorkSpaceDetailResponse
+
+    workspaceRemix(id: ID!): WorkSpaceDetailResponse
 
     user(id: ID!): User
 

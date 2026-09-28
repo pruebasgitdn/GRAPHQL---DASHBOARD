@@ -22,6 +22,8 @@ public class WorkspaceMemberResponse {
 
     private WorkspaceResponse workspace;
 
+    //    private WorkspaceDetailResponse workspace;
+
     private Role role;
 
 

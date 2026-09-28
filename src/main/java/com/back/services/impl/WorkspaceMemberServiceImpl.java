@@ -98,7 +98,7 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
     @Override
     public List<MemberRoleResponse> getMembersFromWorkspace(UUID workspace_id) {
 
-        List<WorkspaceMember> wmembers= workspaceMemberRepository.findAllByWorkspaceId(workspace_id);
+        List<WorkspaceMember> wmembers = workspaceMemberRepository.findAllByWorkspaceId(workspace_id);
 
 
         return wmembers.stream()
