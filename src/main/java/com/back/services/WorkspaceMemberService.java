@@ -1,6 +1,7 @@
 package com.back.services;
 
 import com.back.entities.dto.MemberRoleResponse;
+import com.back.entities.dto.UserTaskStatsDTO;
 import com.back.entities.dto.WorkspaceMemberResponse;
 
 import java.util.List;
@@ -21,5 +22,7 @@ public interface WorkspaceMemberService {
     List<MemberRoleResponse> getMembersFromWorkspace(UUID workspace_id);
 
     Boolean leaveGroup(UUID workspaceId, UUID userId);
+
+    List<UserTaskStatsDTO> getUserTaskStatsByWorkspaceID(UUID workspace_id);
 
 }

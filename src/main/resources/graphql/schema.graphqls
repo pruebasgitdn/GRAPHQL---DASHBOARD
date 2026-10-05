@@ -267,6 +267,16 @@ type WorkspaceResponse {
     color: String
 }
 
+type UserTaskStatsDTO {
+    id: ID
+    name: String
+    email:String
+
+    todo:Int
+    done:Int
+    blocked:Int
+    inProgress:Int
+}
 
 
 type WorkspaceMemberResponse {
@@ -442,6 +452,7 @@ type MyTasksDto {
 
 type Query {
 
+    getUserTaskStatsByWorkspace(workspaceId: ID!): [UserTaskStatsDTO]
 
     getTaskLabelsAndProj(taskId: Int!): TaskLabelProjectDto
 

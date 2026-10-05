@@ -2,10 +2,7 @@ package com.back.controllers;
 import com.back.entities.User;
 import com.back.entities.Workspace;
 import com.back.entities.WorkspaceMember;
-import com.back.entities.dto.MemberRoleResponse;
-import com.back.entities.dto.WorkspaceMemberResponse;
-import com.back.entities.dto.WorkspaceMembersResponse;
-import com.back.entities.dto.WorkspaceResponse;
+import com.back.entities.dto.*;
 import com.back.exceptions.ItemNotFoundException;
 import com.back.repositories.UserRepository;
 import com.back.repositories.WorkspaceRepository;
@@ -84,6 +81,12 @@ public class GraphQLWorkspaceMembersController {
                               @AuthenticationPrincipal UserDetailsImpl user
     ){
         return  workspaceMemberService.leaveGroup(workspaceId,user.getId());
+    }
+
+
+    @QueryMapping(name = "getUserTaskStatsByWorkspace")
+    public List<UserTaskStatsDTO> getUserTaskStatsByWorkspace(@Argument(name = "workspaceId") UUID workspaceId){
+        return  workspaceMemberService.getUserTaskStatsByWorkspaceID(workspaceId);
     }
 
 

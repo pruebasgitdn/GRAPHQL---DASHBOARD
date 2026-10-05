@@ -4,6 +4,7 @@ import com.back.entities.User;
 import com.back.entities.Workspace;
 import com.back.entities.WorkspaceMember;
 import com.back.entities.dto.MemberRoleResponse;
+import com.back.entities.dto.UserTaskStatsDTO;
 import com.back.entities.dto.WorkspaceMemberResponse;
 import com.back.entities.dto.WorkspaceMembersResponse;
 import com.back.entities.mappers.WorkspaceMemberMapper;
@@ -124,5 +125,17 @@ public class WorkspaceMemberServiceImpl implements WorkspaceMemberService {
         workspaceMemberRepository.deleteByWorkspace_IdAndUser_Id(workspace.getId(),user.getId());
 
         return true;
+    }
+
+    @Override
+    public List<UserTaskStatsDTO> getUserTaskStatsByWorkspaceID(UUID workspace_id) {
+
+
+
+
+        return  workspaceMemberRepository.findMemberTaskStats(workspace_id);
+
+
+
     }
 }
