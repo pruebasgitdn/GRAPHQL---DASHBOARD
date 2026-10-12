@@ -89,7 +89,7 @@ public class WorkspaceServiceUnitTest {
         input.setMembers_id(List.of(id1, id2));
 
         NotificationResponse notifResponse = new NotificationResponse();
-        notifResponse.setMessage("Acepta cabroneta");
+        notifResponse.setMessageText("Acepta cabroneta");
 
         when(userRepository.findById(ownerId)).thenReturn(
                 Optional.of(owner)
@@ -149,7 +149,7 @@ public class WorkspaceServiceUnitTest {
         input.setMembers_id(List.of(id1, id2));
 
         NotificationResponse notifResponse = new NotificationResponse();
-        notifResponse.setMessage("Acepta cabroneta");
+        notifResponse.setMessageText("Acepta cabroneta");
 
         when(userRepository.findById(ownerId)).thenReturn(
                 Optional.of(owner)

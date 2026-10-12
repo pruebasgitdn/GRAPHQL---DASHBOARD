@@ -32,7 +32,7 @@ public class NotificationMapper {
         return Notification.builder()
                 .id(notificationResponse.getId())
                 .type(notificationResponse.getType())
-                .message(notificationResponse.getMessage())
+                .messageText(notificationResponse.getMessageText())
                 .title(notificationResponse.getTitle())
                 .user(userEnt)
                 .build();
@@ -44,7 +44,7 @@ public class NotificationMapper {
       // WorkspaceResponse wspaceResp = workspaceMemberMapper.toResponse(notification.get)
        return  NotificationResponse.builder()
                .id(notification.getId())
-               .message(notification.getMessage())
+               .messageText(notification.getMessageText())
                .title(notification.getTitle())
                .type(notification.getType())
                .user(userResp)

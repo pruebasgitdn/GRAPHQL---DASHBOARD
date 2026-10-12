@@ -19,13 +19,33 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+    //Destinatario
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+
+    //Notif de tareas
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_id")
     private Task task;
+
+
+    // Notificaciones de chats
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "conversation_id")
+    private Conversation conversation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "message_id")
+    private Message message;
+
+    // Usuario que origina el evento, por ejemplo,
+    // quien envia el mensaje o asigna la tarea
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "actor_id")
+    private User actor;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -35,7 +55,7 @@ public class Notification {
     private String title;
 
     @Column(columnDefinition = "TEXT")
-    private String message;
+    private String messageText;
 
     @Column(name = "read_at")
     private LocalDateTime readAt;

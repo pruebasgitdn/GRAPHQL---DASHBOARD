@@ -17,6 +17,17 @@ enum TaskLabelType {
 
 }
 
+enum ConversationType {
+DIRECT,WORKSPACE,PROJECT
+}
+
+enum MessageType {
+    TEXT,
+    IMAGE,
+    FILE,
+    SYSTEM
+}
+
 enum ActivityAction{
     created_task,
     updated_task,
@@ -52,7 +63,7 @@ enum Role {
 
 
 enum NotificationType{
-    ASSIGN,COMMENT,STATUS_CHANGE,MENTION
+    ASSIGN,COMMENT,STATUS_CHANGE,MENTION,MESSAGE_RECEIVED
 }
 
 enum TaskStatus {
@@ -350,7 +361,7 @@ input CreateMultipleAssignationsInput {
 type NotificationResponse {
     id: Int
     title: String
-    message: String
+    messageText: String
     user: User
     type: NotificationType
     workspaceMember: WorkspaceMemberResponse

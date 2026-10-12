@@ -121,7 +121,7 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
         NotificationResponse notification = NotificationResponse.builder()
                 .user(userMapper.toResponse(user_Assign))
                 .title("Tienes una nueva tarea asignada")
-                .message("Se te ha asignado una nueva tarea")
+                .messageText("Se te ha asignado una nueva tarea")
                 .type(NotificationType.ASSIGN)
                 .build();
 
@@ -192,7 +192,7 @@ public class TaskAssigneeServiceImpl implements TaskAssigneeService {
                         .map((n) -> Notification.builder()
                                 .user(n)
                                 .title("Tienes una nueva tarea asignada")
-                                .message("Se te ha asignado una nueva tarea")
+                                .messageText("Se te ha asignado una nueva tarea")
                                 .type(NotificationType.ASSIGN)
                                 .build())
                                 .toList();

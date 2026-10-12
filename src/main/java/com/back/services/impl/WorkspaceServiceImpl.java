@@ -120,7 +120,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                     Notification notification = Notification.builder()
                             .user(m.getUser())
                             .title("Nuevo en espacio de trabajo")
-                            .message("Has sido añadido a un espacio de trabajo")
+                            .messageText("Has sido añadido a un espacio de trabajo")
                             .type(NotificationType.COMMENT)
                             .build();
 
@@ -249,7 +249,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                     Notification notification = Notification.builder()
                             .user(user)
                             .title("Nuevo en espacio de trabajo")
-                            .message("Has sido añadido a un espacio de trabajo")
+                            .messageText("Has sido añadido a un espacio de trabajo")
                             .type(NotificationType.COMMENT)
                             .build();
 

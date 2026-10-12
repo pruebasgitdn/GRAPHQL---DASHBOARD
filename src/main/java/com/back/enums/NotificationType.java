@@ -8,7 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum NotificationType {
 
-    ASSIGN,COMMENT,STATUS_CHANGE,MENTION
+    ASSIGN,COMMENT,STATUS_CHANGE,MENTION,MESSAGE_RECEIVED
 
 
 }
