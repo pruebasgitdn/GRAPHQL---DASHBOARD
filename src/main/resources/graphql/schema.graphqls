@@ -5,6 +5,7 @@ type User {
     profilePic: String
 }
 
+
 scalar Date
 scalar DateTime
 scalar LocalTime
@@ -135,6 +136,16 @@ type TaskTrendCL {
     priority:TaskPriority
     total:Int
 }
+
+type ConversationDTO {
+    id: ID!
+  type: ConversationType!
+    name:String
+    workspaceId:ID
+    projectId:Int
+}
+
+
 
 
 type TaskStats {
@@ -439,6 +450,15 @@ type CommentResponse {
     user:User
 }
 
+type MessagesDTO {
+    id:ID
+    senderId: ID
+    emailSender: String
+    conversationId: ID
+    conversationType: ConversationType
+    content: String
+}
+
 type MyTasksDto {
 
     id: Int
@@ -462,6 +482,10 @@ type MyTasksDto {
 
 
 type Query {
+
+    findMessagesByConversationId(conversationId: ID!):[MessagesDTO]
+
+    findDirectConversationBetweenTwoUsers(userOne: ID!, userTwo: ID!) : ConversationDTO
 
     getUserTaskStatsByWorkspace(workspaceId: ID!): [UserTaskStatsDTO]
 

@@ -23,38 +23,49 @@ public class WebSocketConfig implements WebGraphQlInterceptor {
     @Override
     public Mono<WebGraphQlResponse> intercept(WebGraphQlRequest request, Chain chain) {
 
-        System.out.println("WSOCK HEADERS: " + request.getHeaders());
+//        System.out.println("WSOCK HEADERS: " + request.getHeaders());
 
-        // =========================
-        // 1. EXTRAER TOKEN
-        // =========================
+        //Extraer tkn
         String token = null;
 
-        // Authorization header (PRIORIDAD)
+        // Authorization del header
         String authHeader = request.getHeaders().getFirst("Authorization");
-
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
+
+           String headerToken = authHeader.substring(7);
+
+            if(authenticationService.isAccessToken(authHeader)){
+                token = headerToken;
+            }
         }
 
-        // Cookie fallback
+        // Cookies del header si no coge el de authorization
         if (token == null) {
             String cookie = request.getHeaders().getFirst("cookie");
 
             if (cookie != null) {
-                token = Arrays.stream(cookie.split(";"))
+               String cookieToken = Arrays.stream(cookie.split(";"))
                         .map(String::trim)
                         .filter(c -> c.startsWith("sessionToken="))
                         .findFirst()
                         .map(c -> c.substring("sessionToken=".length()))
                         .orElse(null);
+
+                if (cookieToken != null
+                        && authenticationService.isAccessToken(cookieToken)) {
+                    token = cookieToken;
+                }
+
             }
+
+
+
         }
 
-        System.out.println("WSOCK TOKEN: " + token);
+//        System.out.println("WSOCK TOKEN: " + token);
 
-        // 2. VALIDAR TOKEN
-        if (token != null && authenticationService.isAccessToken(token)) {
+        // VALIDAR TOKEN
+        if (token != null ) {
 
             UserDetails userDetails = authenticationService.validateToken(token);
 
@@ -68,15 +79,11 @@ public class WebSocketConfig implements WebGraphQlInterceptor {
             System.out.println("WSOCKET USER AUTHENTICATED: " + userDetails.getUsername());
 
 
-            // 3. INYECTAR CONTEXTO GRAPHQL + SECURITY
+            // INYECTAR CONTEXTO GRAPHQL + SECURITY
 
-//            return chain.next(request)
-//                    .contextWrite(
-//                            ReactiveSecurityContextHolder.withAuthentication(authentication)
-//                    );
-
-
-            //SecurituContext en los att del request del graph
+//
+            //SecurituContext en los att del request del graph y ..
+            // meter la autenticacion
             SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
             securityContext.setAuthentication(authentication);
 
